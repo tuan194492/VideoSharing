@@ -3,6 +3,7 @@ const User = require('../model/User');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
+const userService = require("../service/userService");
 dotenv.config();
 // Access the JWT secret as an environment variable
 const jwtSecret = process.env.JWT_SECRET;
@@ -27,7 +28,7 @@ const login = async (req, res, next) => {
         const token = jwt.sign({ userId: user.id}, jwtSecret, {
             expiresIn: "1h",
           });
-          res.json({
+        return res.json({
             token: token,
             user: user,
             message: "Login successful",
@@ -41,7 +42,20 @@ const login = async (req, res, next) => {
 }
 
 const register = async (req, res, next) => {
-    
+    const validateUser = await userService.validateNewUser(req.body);
+    console.log(validateUser)
+    if (validateUser.success) {
+        await userService.createNewUser(req.body);
+        return res.status(200).json({
+            success: true,
+            message: "Register user successful!"
+        })
+    } else {
+        return res.status(400).json({
+            success: true,
+            message: validateUser.message
+        })
+    }
 }
 
 module.exports = {
