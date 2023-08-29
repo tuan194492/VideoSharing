@@ -1,4 +1,9 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
+// Access the JWT secret as an environment variable
+const jwtSecret = process.env.JWT_SECRET;
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers["authorization"];

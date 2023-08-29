@@ -1,0 +1,73 @@
+const express = require("express");
+const Video = require("../model/Video");
+const fileUtils = require("../utils/video/FileUtils");
+const { VIDEO_STATUS } = require("../constant/enum/ENUM");
+
+const createVideo = async (meta, file, user) => {
+  const url = fileUtils.createUrlForVideo(file, user);
+  const shortenUrl = fileUtils.createShortenUrlForVideo(file, user);
+  const storeResult = await storeVideo(file, url);
+  console.log(storeResult);
+  if (storeResult.success) {
+    await createVideoMetaData(meta, shortenUrl, user);
+    return {
+        success: true,
+        message: "Upload File successful"
+    }
+  } else {
+    return {
+        success: false,
+        message: storeResult.message
+    }
+  }
+  
+};
+
+const createVideoMetaData = async (meta, url, user) => {
+  const video = {
+    ...meta,
+    url: url,
+    publisher_id: user.userId,
+    status: VIDEO_STATUS.PUBLIC,
+    views: 0,
+  };
+
+  console.log(video)
+  try {
+    await Video.create(video);
+    return {
+      success: true,
+      message: "Create Video successful",
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err,
+    };
+  }
+};
+
+const storeVideo = (file, url) => {
+  return new Promise((resolve, reject) => {
+    file.mv(url, (err) => {
+      let result;
+      if (err) {
+        result = {
+          success: false,
+          message: "Upload file not successful",
+        };
+        reject(result);
+      } else {
+        result = {
+          success: true,
+          message: "Upload file successful",
+        };
+        resolve(result);
+      }
+    });
+  });
+};
+
+module.exports = {
+  createVideo,
+};

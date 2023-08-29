@@ -45,6 +45,19 @@ const swaggerDefinition = {
 };
 
 const options = {
+  swaggerOptions: {
+    authAction: {
+      Basic: {
+        name: "user1",
+        schema: {
+          type:"application/json",
+          in: "header",
+          name: "Authorization",
+        },
+        value: "Basic bG9naW46cGFzc3dvcmQ="
+      }
+    }
+  },
   swaggerDefinition,
   // Paths to files containing OpenAPI definitions
   apis: ['./src/routes/*.js'],

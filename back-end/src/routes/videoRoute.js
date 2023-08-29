@@ -3,6 +3,33 @@ const router = express.Router();
 const videoController = require('../controller/videoController');
 const authMiddleware = require('../middlleware/authMiddleware');
 
+/**
+ * @swagger
+ * /api/video:
+ *   post:
+ *     summary: Create a new video
+ *     description: Create a new video
+ *     consumes:
+ *        - multipart/form-data
+ *     requestBody:
+ *      content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fileName:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *          201: 
+ *              description: Success
+ *          500:
+ *              description: Internal Server error
+ *   
+ * 
+ * */
+
+
 router.get('/data/:id', videoController.getVideoDataById);
 router.get('/:id', authMiddleware.authenticateToken ,videoController.getVideoById);
 router.post('/', authMiddleware.authenticateToken ,videoController.createVideo);
