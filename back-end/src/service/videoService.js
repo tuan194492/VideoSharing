@@ -68,6 +68,22 @@ const storeVideo = (file, url) => {
   });
 };
 
+const findVideoById = async (id) => {
+    const video = await Video.findByPk(id);
+    if (video) {
+        return {
+            success: true,
+            data: video
+        }
+    } else {
+        return {
+            success: false,
+            message: "Video is not found"
+        }
+    }
+}
+
 module.exports = {
   createVideo,
+  findVideoById
 };
