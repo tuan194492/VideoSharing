@@ -24,9 +24,38 @@ const createVideo = async (req, res, next) => {
   }
 };
 
-const updateVideo = async (req, res, next) => {};
+const updateVideo = async (req, res, next) => {
+  const id = req.query.id;
+  const result = await videoService.updateVideo(req.body, id);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
 
-const deleteVideo = async (req, res, next) => {};
+const deleteVideo = async (req, res, next) => {
+  const id = req.query.id;
+  const result = await videoService.deleteVideoById(id);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: "Delete Video successful"
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
 
 const getVideoById = async (req, res, next) => {
   const id = req.query.id;

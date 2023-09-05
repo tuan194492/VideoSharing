@@ -23,6 +23,47 @@ const createVideo = async (meta, file, user) => {
   
 };
 
+const updateVideo = async (videoData, id) => {
+  const video = await Video.findByPk(id);
+    if (video) {
+        video = {
+          ...video,
+          videoData
+        }
+        await video.save();
+        return {
+            success: true,
+            data: video
+        }
+    } else {
+        return {
+            success: false,
+            message: "Video is not found"
+        }
+    }
+};
+
+const deleteVideoById = async (id) => {
+  const video = await Video.findByPk(id);
+    if (video) {
+        video = {
+          ...video,
+          status: VIDEO_STATUS.DELETED
+        }
+        await video.save(); // Soft delete
+        return {
+            success: true,
+            data: video,
+            message: "Delete Video successful"
+        }
+    } else {
+        return {
+            success: false,
+            message: "Video is not found"
+        }
+    }
+};
+
 const createVideoMetaData = async (meta, url, user) => {
   const video = {
     ...meta,
@@ -85,5 +126,7 @@ const findVideoById = async (id) => {
 
 module.exports = {
   createVideo,
-  findVideoById
+  findVideoById,
+  updateVideo,
+  deleteVideoById
 };
