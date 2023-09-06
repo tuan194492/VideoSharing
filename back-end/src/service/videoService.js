@@ -23,6 +23,29 @@ const createVideo = async (meta, file, user) => {
   
 };
 
+const getViewerVideoList = async (data) => {
+  
+  try {
+    console.log(data)
+    const page = parseInt(data.page) || 1;
+    const pageSize = parseInt(data.pageSize) || 10;
+    const result = await Video.findAndCountAll({
+      limit: pageSize,
+      offset: page - 1,
+    });
+    return {
+      success: true,
+      message: "Get video list successfull",
+      data: result,
+    };
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+    }; 
+  }
+}
+
 const updateVideo = async (videoData, id) => {
   const video = await Video.findByPk(id);
     if (video) {
@@ -128,5 +151,6 @@ module.exports = {
   createVideo,
   findVideoById,
   updateVideo,
-  deleteVideoById
+  deleteVideoById,
+  getViewerVideoList
 };

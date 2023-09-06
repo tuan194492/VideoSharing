@@ -47,7 +47,7 @@ const deleteVideo = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       data: result.data,
-      message: "Delete Video successful"
+      message: "Delete Video successful",
     });
   } else {
     return res.status(400).json({
@@ -112,6 +112,21 @@ const streamVideoById = async (req, res, next) => {
   videoStream.pipe(res);
 };
 
+const getViewerVideoList = async (req, res, next) => {
+  const result = await videoService.getViewerVideoList(req.body);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    })
+  }
+};
+
 module.exports = {
   createVideo,
   updateVideo,
@@ -119,4 +134,5 @@ module.exports = {
   getVideoById,
   getVideoDataById,
   streamVideoById,
+  getViewerVideoList,
 };
