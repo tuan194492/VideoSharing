@@ -1,9 +1,9 @@
 const express = require("express");
 
 const VIDEO_STATUS = {
-    PUBLIC: 1,
-    PRIVATE: 2,
-    DELETED: 3
+    PUBLIC: 'PUBLIC',
+    PRIVATE: 'PRIVATE',
+    DELETED: 'DELETED'
 }
 
 module.exports = {

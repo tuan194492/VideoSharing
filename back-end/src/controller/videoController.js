@@ -43,6 +43,7 @@ const updateVideo = async (req, res, next) => {
 const deleteVideo = async (req, res, next) => {
   const id = req.params.id;
   const result = await videoService.deleteVideoById(id);
+  console.log(result)
   if (result.success) {
     return res.status(200).json({
       success: true,
