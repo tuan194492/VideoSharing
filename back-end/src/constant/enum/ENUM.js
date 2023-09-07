@@ -6,6 +6,19 @@ const VIDEO_STATUS = {
     DELETED: 'DELETED'
 }
 
+const NOTIFY_ACTION = {
+    POST_VIDEO: 'Post Video',
+    COMMENT: 'Comment',
+    SUBCRIBE: 'Subcribe'
+}
+
+const NOTIFY_STATUS = {
+    READ: 'R',
+    UN_READ: 'U'
+}
+
 module.exports = {
-    VIDEO_STATUS
+    VIDEO_STATUS,
+    NOTIFY_ACTION,
+    NOTIFY_STATUS
 }

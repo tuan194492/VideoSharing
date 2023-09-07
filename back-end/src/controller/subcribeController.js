@@ -1,11 +1,19 @@
 const express = require("express");
 
 const subcriberService = require("../service/subcriberService");
+const notifyService = require("../service/notifyService");
+const {NOTIFY_ACTION} = require("../constant/enum/ENUM")
 
 const subcribeToChannel = async (req, res, next) => {
     const user = req.user;
     const subcribeResult = await subcriberService.subcribeToUser(user.userId, req.body.channelId);
     if (subcribeResult.success) {
+        const params = {
+            actorId: req.user.userId,
+            videoId: 0,
+            notifierId: req.body.channelId
+        };
+        notifyService.createNotifications(params, NOTIFY_ACTION.SUBCRIBE);
         return res.status(200).json({
             success: true,
             message: "Subcribe successful"
