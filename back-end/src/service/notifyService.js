@@ -15,17 +15,6 @@ const subcriberService = require("../service/subcriberService");
 
  */
 
-    /*
-    const Notification = sequelize.define('Notification', {
-        actor_id: DataTypes.INTEGER,
-        notifer_id: DataTypes.INTEGER,
-        video_id: DataTypes.INTEGER,
-        status: DataTypes.CHAR,
-        type: DataTypes.STRING,
-        created_at: DataTypes.DATE,
-  });
-    */
-
 /* Params bao gom: 
 *    actor_id (ID Người gây ra hành động)
 *    video_id (Đối với TH Comment hoặc like hoặc đăng)
@@ -95,7 +84,57 @@ const sendNotifies = async (notifierList) => {
     
 }
 
+const getNotificationsByUser = async (userId) => {
+    console.log(userId)
+    try {
+        const notifications = await Notification.findAll({
+            where: {
+                notifer_id: userId
+            }
+        })
+        return {
+            success: true,
+            data: notifications,
+            message: "Get notification successful"
+        }
+    } catch (e) {
+        return {
+            success: false,
+            data: [],
+            message: "No notifications"
+        }
+    }
+}
+
+const readNotification = async (userId, notificationId) => {
+    try {
+        const notification = await Notification.findByPk(notificationId);
+        if (notification && notification.notifer_id == userId) {
+            notification.status = NOTIFY_STATUS.READ;
+            await notification.save();
+            return {
+                success: true,
+                message: "Read notification successful"
+            }
+        } else {
+            return {
+                success: false,
+                message: "Some things happen!"
+            }
+        }
+        
+    } catch (e) {
+        return {
+            success: false,
+            data: [],
+            message: "No notification"
+        }
+    }
+}
+
 module.exports = {
     notifyToAllNotifiers,
-    createNotifications
+    createNotifications,
+    getNotificationsByUser,
+    readNotification
 }
