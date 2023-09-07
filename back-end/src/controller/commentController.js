@@ -2,6 +2,8 @@ const express = require("express");
 
 const videoService = require("../service/videoService");
 const commentService = require("../service/commentService");
+const notifyService = require("../service/notifyService");
+const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
 
 const getCommentsByVideo = async (req, res, next) => {
   const id = req.params.videoId;
@@ -36,9 +38,19 @@ const getCommentsByVideo = async (req, res, next) => {
 
 const addComment = async (req, res, next) => {
   const videoId = req.params.videoId;
-  console.log(req.user)
-  const result = await commentService.addComment(req.body.comment, req.user, videoId);
+  console.log(req.user);
+  const result = await commentService.addComment(
+    req.body.comment,
+    req.user,
+    videoId
+  );
   if (result.success) {
+    const params = {
+      actorId: req.user.userId,
+      videoId: videoId,
+      notifierId: 0,
+    };
+    notifyService.createNotifications(params, NOTIFY_ACTION.COMMENT);
     return res.status(200).json({
       success: true,
       message: result.message,
@@ -57,16 +69,16 @@ const deleteComment = async (req, res, next) => {
   if (comment) {
     console.log(comment);
     if (comment.user_id != req.user.userId) {
-        return res.status(403).json({
-            success: false,
-            message: "Only own use can delete this comment",
-          });
+      return res.status(403).json({
+        success: false,
+        message: "Only own use can delete this comment",
+      });
     }
   } else {
     return res.status(400).json({
-        success: false,
-        message: "Comment not found",
-      });
+      success: false,
+      message: "Comment not found",
+    });
   }
   const result = await commentService.deleteComment(id);
   if (result.success) {

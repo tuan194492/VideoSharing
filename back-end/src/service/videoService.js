@@ -152,7 +152,7 @@ const findVideoById = async (id) => {
     if (video) {
         return {
             success: true,
-            data: video
+            data: video.dataValues
         }
     } else {
         return {

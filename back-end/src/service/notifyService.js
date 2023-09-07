@@ -56,7 +56,8 @@ const getNotifierList = async (actorId, videoId, notifierId, action) => {
         case NOTIFY_ACTION.SUBCRIBE:
             return [notifierId];
         case NOTIFY_ACTION.COMMENT:
-            const channelId = await videoService.findVideoById(videoId).data;
+            const channelId = (await videoService.findVideoById(videoId)).data.publisher_id;
+            console.log(channelId)
             return [channelId];
         case NOTIFY_ACTION.POST_VIDEO:
             const subcriberList = await subcriberService.getListOfSubcribersByChannelId(actorId).data;
