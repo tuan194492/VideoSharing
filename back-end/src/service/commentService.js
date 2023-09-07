@@ -5,7 +5,7 @@ const Comment = require("../model/Comment");
 const addComment = async (comment, sender, videoId) => {
   try {
     await Comment.create({
-      user_id: sender.id,
+      user_id: sender.userId,
       video_id: videoId,
       value: comment,
     });
@@ -21,6 +21,15 @@ const addComment = async (comment, sender, videoId) => {
   }
 };
 
+const findCommentById = async (id) => {
+    const comment = await Comment.findByPk(id);
+    if (comment != null) {
+      return comment.dataValues;
+    } else {
+      return null;
+    }
+}
+
 const getCommentByVideo = async (videoId, page, pageSize) => {
   try {
     const result = await Comment.findAndCountAll({
@@ -31,7 +40,7 @@ const getCommentByVideo = async (videoId, page, pageSize) => {
       offset: page - 1,
     });
     return {
-      success: false,
+      success: true,
       message: "Get comment list successfull",
       data: result,
     };
@@ -66,4 +75,5 @@ module.exports = {
   addComment,
   getCommentByVideo,
   deleteComment,
+  findCommentById
 };

@@ -4,6 +4,7 @@ const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 15 * 60 });
 const videoService = require("../service/videoService");
 const notifyService = require("../service/notifyService");
+const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
 
 const getVideoDataById = async (req, res, next) => {};
 
@@ -13,7 +14,12 @@ const createVideo = async (req, res, next) => {
   console.log(req.user);
   const result = await videoService.createVideo(meta, file, req.user);
   if (result.success) {
-    notifyService.notifyToAllNotifiers();
+    const params = {
+      actorId: req.user.userId,
+      videoId: result.videoId,
+      notifierId: 0,
+    };
+    notifyService.createNotifications(params, NOTIFY_ACTION.POST_VIDEO);
     return res.status(201).json({
       message: "Upload video successful",
     });
@@ -25,7 +31,7 @@ const createVideo = async (req, res, next) => {
 };
 
 const updateVideo = async (req, res, next) => {
-  const id = req.query.id;
+  const id = req.params.id;
   const result = await videoService.updateVideo(req.body, id);
   if (result.success) {
     return res.status(200).json({
@@ -41,13 +47,14 @@ const updateVideo = async (req, res, next) => {
 };
 
 const deleteVideo = async (req, res, next) => {
-  const id = req.query.id;
+  const id = req.params.id;
   const result = await videoService.deleteVideoById(id);
+  console.log(result);
   if (result.success) {
     return res.status(200).json({
       success: true,
       data: result.data,
-      message: "Delete Video successful"
+      message: "Delete Video successful",
     });
   } else {
     return res.status(400).json({
@@ -58,7 +65,7 @@ const deleteVideo = async (req, res, next) => {
 };
 
 const getVideoById = async (req, res, next) => {
-  const id = req.query.id;
+  const id = req.params.id;
   const result = await videoService.findVideoById(id);
   if (result.success) {
     return res.status(200).json({
@@ -112,6 +119,21 @@ const streamVideoById = async (req, res, next) => {
   videoStream.pipe(res);
 };
 
+const getViewerVideoList = async (req, res, next) => {
+  const result = await videoService.getViewerVideoList(req.body);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
+
 module.exports = {
   createVideo,
   updateVideo,
@@ -119,4 +141,5 @@ module.exports = {
   getVideoById,
   getVideoDataById,
   streamVideoById,
+  getViewerVideoList,
 };

@@ -9,10 +9,12 @@ const createVideo = async (meta, file, user) => {
   const storeResult = await storeVideo(file, url);
   console.log(storeResult);
   if (storeResult.success) {
-    await createVideoMetaData(meta, shortenUrl, user);
+    const ress = await createVideoMetaData(meta, shortenUrl, user);
+    const videoId = ress.data;
     return {
         success: true,
-        message: "Upload File successful"
+        message: "Upload File successful",
+        videoId: videoId
     }
   } else {
     return {
@@ -23,13 +25,37 @@ const createVideo = async (meta, file, user) => {
   
 };
 
+const getViewerVideoList = async (data) => {
+  
+  try {
+    console.log(data)
+    const page = parseInt(data.page) || 1;
+    const pageSize = parseInt(data.pageSize) || 10;
+    const result = await Video.findAndCountAll({
+      limit: pageSize,
+      offset: page - 1,
+    });
+    return {
+      success: true,
+      message: "Get video list successfull",
+      data: result,
+    };
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+    }; 
+  }
+}
+
 const updateVideo = async (videoData, id) => {
-  const video = await Video.findByPk(id);
+  try {
+    const video = await Video.findByPk(id);
     if (video) {
-        video = {
-          ...video,
-          videoData
-        }
+      console.log(video)
+        const {title, description} = videoData;
+        video.title = title;
+        video.description = description;
         await video.save();
         return {
             success: true,
@@ -41,19 +67,26 @@ const updateVideo = async (videoData, id) => {
             message: "Video is not found"
         }
     }
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+  }
+  }
+  
 };
 
 const deleteVideoById = async (id) => {
-  const video = await Video.findByPk(id);
+  try {
+    let video = await Video.findByPk(id);
+    console.log(video.dataValues.id);
     if (video) {
-        video = {
-          ...video,
-          status: VIDEO_STATUS.DELETED
-        }
+      console.log("ABC DEF")
+        video.status = VIDEO_STATUS.DELETED;
         await video.save(); // Soft delete
         return {
             success: true,
-            data: video,
+            data: video.dataValues,
             message: "Delete Video successful"
         }
     } else {
@@ -62,6 +95,13 @@ const deleteVideoById = async (id) => {
             message: "Video is not found"
         }
     }
+  } catch (e) {
+    return {
+      success: false,
+      message: e
+  }
+  }
+  
 };
 
 const createVideoMetaData = async (meta, url, user) => {
@@ -75,10 +115,11 @@ const createVideoMetaData = async (meta, url, user) => {
 
   console.log(video)
   try {
-    await Video.create(video);
+    const videoId = await Video.create(video);
     return {
       success: true,
       message: "Create Video successful",
+      data: videoId.id
     };
   } catch (err) {
     return {
@@ -114,7 +155,7 @@ const findVideoById = async (id) => {
     if (video) {
         return {
             success: true,
-            data: video
+            data: video.dataValues
         }
     } else {
         return {
@@ -128,5 +169,6 @@ module.exports = {
   createVideo,
   findVideoById,
   updateVideo,
-  deleteVideoById
+  deleteVideoById,
+  getViewerVideoList
 };
