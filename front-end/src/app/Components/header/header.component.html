@@ -1,0 +1,29 @@
+<!-- <p>header works!</p> -->
+<div class="header">
+  <div class="header__left">
+   <button (click)="changeEvent()"> <mat-icon class="header__icon">menu</mat-icon> </button>
+    <img [routerLink]="['/']" class="header__logo" src="/assets/ytIcon.png" alt="youtube logo" />
+  </div>
+  <form class="header__middle">
+    <input ngModel name="search" id="search" class="header__search" type="search" placeholder="Search" required />
+    <button class="header__searchBtn" type="submit">
+      <mat-icon class="header__icon">search</mat-icon>
+    </button>
+  </form>
+  <div class="header__right">
+    <mat-icon class="header__icon" title="login" (click)="openDialogLogin()">login</mat-icon>
+    <mat-icon class="header__icon" [routerLink]="['/videoManeger']" title="create new event">open_in_new</mat-icon>
+    <mat-icon class="header__icon" routerLink="/videoManeger">video_call</mat-icon>
+    <mat-icon class="header__icon">apps</mat-icon>
+    <mat-icon class="header__icon">notifications</mat-icon>
+    <img [routerLink]="['/profile']" [src]="user?.photoURL" class="mat-card-avatar" title="Your Profile" />
+  </div>
+</div>
+<!-- 
+  #searchForm="ngForm"
+  (ngSubmit)="submit(searchForm)"
+ 
+
+  #search="ngModel"
+
+  [disabled]="!searchForm.valid" -->

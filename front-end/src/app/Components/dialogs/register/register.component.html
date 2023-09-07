@@ -1,0 +1,42 @@
+<p>register works!</p>
+<form [formGroup]="registerForm" (ngSubmit)="registerform()">
+    <mat-dialog-content>
+        <header>
+            <h1>Đăng nhập</h1>
+        </header>
+        <p>
+            <mat-form-field>
+                <input matInput  placeholder="name" type="text" formControlName="name" required>
+                <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+            <!-- <span class ="errorMessage1">{{errorLoginEmail}}</span> -->
+        </p>
+        <p>
+            <mat-form-field>
+                <input matInput  placeholder="email" type="email" formControlName="email" required>
+                <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+            <!-- <span class ="errorMessage1">{{errorLoginEmail}}</span> -->
+        </p>
+        <p>
+            <mat-form-field>
+                <input matInput  type="password" formControlName="password1"  placeholder="Mật khẩu" required>
+                <mat-icon matSuffix>password</mat-icon>
+            </mat-form-field>
+            <!-- <span class ="errorMessage1">{{errorLoginPass}}</span> -->
+        </p>
+        <p>
+            <mat-form-field>
+                <input matInput  type="password" formControlName="password2"  placeholder="Nhập lại mật khẩu" required>
+                <mat-icon matSuffix>password</mat-icon>
+            </mat-form-field>
+            <!-- <span class ="errorMessage1">{{errorLoginPass}}</span> -->
+        </p>
+    </mat-dialog-content>
+<button mat-raised-button  type="submit" color="primary">Đăng ký</button>
+</form>
+<!-- <mat-dialog-actions>
+<button mat-raised-button [matDialogClose]="" color="primary" (click)=>Đăng ký</button>
+<button mat-raised-button [matDialogClose]="" color="warn">Quên mật khẩu</button> -->
+
+<!-- </mat-dialog-actions> -->

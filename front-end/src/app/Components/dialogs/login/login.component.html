@@ -1,0 +1,27 @@
+<form [formGroup]="loginForm" (ngSubmit)="loginform()">
+    <mat-dialog-content>
+        <header>
+            <h1>Đăng nhập</h1>
+        </header>
+        <p>
+            <mat-form-field>
+                <input matInput [(ngModel)]="data.email" placeholder="email" type="email" formControlName="email" required>
+                <mat-icon matSuffix>email</mat-icon>
+            </mat-form-field>
+            <span class ="errorMessage1">{{errorLoginEmail}}</span>
+        </p>
+        <p>
+            <mat-form-field>
+                <input matInput [(ngModel)]="data.password" type="password" formControlName="password" required>
+                <mat-icon matSuffix>password</mat-icon>
+            </mat-form-field>
+            <span class ="errorMessage1">{{errorLoginPass}}</span>
+        </p>
+    </mat-dialog-content>
+<button mat-raised-button  type="submit" color="primary">Đăng nhập</button>
+</form>
+<mat-dialog-actions>
+<button mat-raised-button [matDialogClose]="" color="primary" (click)='openDialogRegister()'>Đăng ký</button>
+<button mat-raised-button [matDialogClose]="" color="warn">Quên mật khẩu</button>
+
+</mat-dialog-actions>
