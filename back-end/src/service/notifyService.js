@@ -36,8 +36,10 @@ const createNotifications = async (params, action) => {
     const {actorId, videoId, notifierId} = params;
     console.log(params)
     let notifierList = await getNotifierList(actorId, videoId, notifierId, action);
+    console.log("Notifier List", notifierList)
     try {
         for (let notifier of notifierList) {
+            console.log("Notifier id", notifier);
             Notification.create({
                 actor_id: actorId,
                 notifer_id: notifier,
@@ -60,8 +62,9 @@ const getNotifierList = async (actorId, videoId, notifierId, action) => {
             console.log(channelId)
             return [channelId];
         case NOTIFY_ACTION.POST_VIDEO:
-            const subcriberList = await subcriberService.getListOfSubcribersByChannelId(actorId).data;
-            return subcriberList;
+            const subcriberList = await subcriberService.getListOfSubcribersByChannelId(actorId);
+            const subcribers = subcriberList.data.map(e => e.dataValues.subscriber_id)
+            return subcribers;
         default:
             return [];
     }

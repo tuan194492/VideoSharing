@@ -9,10 +9,12 @@ const createVideo = async (meta, file, user) => {
   const storeResult = await storeVideo(file, url);
   console.log(storeResult);
   if (storeResult.success) {
-    await createVideoMetaData(meta, shortenUrl, user);
+    const ress = await createVideoMetaData(meta, shortenUrl, user);
+    const videoId = ress.data;
     return {
         success: true,
-        message: "Upload File successful"
+        message: "Upload File successful",
+        videoId: videoId
     }
   } else {
     return {
@@ -113,10 +115,11 @@ const createVideoMetaData = async (meta, url, user) => {
 
   console.log(video)
   try {
-    await Video.create(video);
+    const videoId = await Video.create(video);
     return {
       success: true,
       message: "Create Video successful",
+      data: videoId.id
     };
   } catch (err) {
     return {
