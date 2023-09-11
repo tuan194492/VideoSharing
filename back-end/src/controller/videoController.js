@@ -6,6 +6,8 @@ const videoService = require("../service/videoService");
 const notifyService = require("../service/notifyService");
 const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
 
+const storingProgess = [];
+
 const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
@@ -81,6 +83,8 @@ const getVideoById = async (req, res, next) => {
 };
 
 const streamVideoById = async (req, res, next) => {
+  // console.log("Request from", req.socket);
+  
   const id = req.params.id;
   let videoPath = "";
   // Can use cache to store url for Id video
@@ -116,6 +120,16 @@ const streamVideoById = async (req, res, next) => {
 
   res.writeHead(206, headers);
   const videoStream = fs.createReadStream(videoPath, { start, end });
+  storingProgess.push({
+    video: id,
+    start: start,
+    end: end,
+  })
+  console.log({
+    video: id,
+    start: start,
+    end: end,
+  })
   videoStream.pipe(res);
 };
 
