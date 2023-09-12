@@ -5,6 +5,7 @@ const fileUpload = require('express-fileupload')
 const route = require('./routes/index');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
+const bodyParser = require('body-parser');
 
 const {databaseInit} = require("../src/utils/database/index")
 
@@ -13,6 +14,7 @@ const port = 3000;
 
 app.use(cors()) // Use this after the variable declaration
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")))

@@ -6,6 +6,8 @@ const videoService = require("../service/videoService");
 const notifyService = require("../service/notifyService");
 const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
 
+const viewLogs = new Map();
+
 const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
@@ -81,6 +83,8 @@ const getVideoById = async (req, res, next) => {
 };
 
 const streamVideoById = async (req, res, next) => {
+  // console.log("Request from", req.socket);
+  
   const id = req.params.id;
   let videoPath = "";
   // Can use cache to store url for Id video
@@ -116,6 +120,22 @@ const streamVideoById = async (req, res, next) => {
 
   res.writeHead(206, headers);
   const videoStream = fs.createReadStream(videoPath, { start, end });
+  storingProgess.push({
+    video: id,
+    start: start,
+    end: end,
+    percentage: (end - start) / videoSize + storingProgess,
+    origin: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+    id: req.ip
+  })
+  console.log({
+    video: id,
+    start: start,
+    end: end,
+    percentage: (end - start) / videoSize,
+    origin: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+    ip: req.ip
+  })
   videoStream.pipe(res);
 };
 
@@ -134,6 +154,24 @@ const getViewerVideoList = async (req, res, next) => {
   }
 };
 
+const searchVideos = async (req, res, next) => {
+  let {keyword, page, pageSize} = req.body;
+  console.log("Searching video")
+  console.log(keyword)
+  const result = await videoService.fullTextSearchVideo(keyword, page || 1, pageSize || 10);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      data: result.data
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    })
+  }
+}
+
 module.exports = {
   createVideo,
   updateVideo,
@@ -142,4 +180,5 @@ module.exports = {
   getVideoDataById,
   streamVideoById,
   getViewerVideoList,
+  searchVideos
 };
