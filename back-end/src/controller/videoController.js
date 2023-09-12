@@ -3,12 +3,13 @@ const fs = require("fs");
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 15 * 60 });
 const videoService = require("../service/videoService");
+const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
 const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
 
 const storingProgess = [];
 
-const getVideoDataById = async (req, res, next) => {};
+const getVideoDataById = async (req, res, next) => { };
 
 const createVideo = async (req, res, next) => {
   const file = req.files.file;
@@ -84,7 +85,7 @@ const getVideoById = async (req, res, next) => {
 
 const streamVideoById = async (req, res, next) => {
   // console.log("Request from", req.socket);
-  
+
   const id = req.params.id;
   let videoPath = "";
   // Can use cache to store url for Id video
@@ -135,10 +136,20 @@ const streamVideoById = async (req, res, next) => {
 
 const getViewerVideoList = async (req, res, next) => {
   const result = await videoService.getViewerVideoList(req.body);
+
   if (result.success) {
+    let videos = [];
+    for (let video of result.data.rows) {
+      const user = await userService.getUserById(video.dataValues.publisher_id);
+      videos.push({
+        ...video.dataValues,
+        user_name: user?.name || "No name"
+      })
+    }
     return res.status(200).json({
       success: true,
-      data: result.data,
+      count: result.data.count,
+      data: videos,
     });
   } else {
     return res.status(400).json({

@@ -40,7 +40,17 @@ const createNewUser = async (user) => {
   }
 };
 
+const getUserById = async (id) => {
+  try {
+    return await User.findByPk(id);
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+}
+
 module.exports = {
   validateNewUser,
   createNewUser,
+  getUserById
 };
