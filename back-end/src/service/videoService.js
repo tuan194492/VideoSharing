@@ -1,4 +1,5 @@
 const express = require("express");
+const Sequelize = require("sequelize");
 const Video = require("../model/Video");
 const fileUtils = require("../utils/video/FileUtils");
 const { VIDEO_STATUS } = require("../constant/enum/ENUM");
@@ -10,25 +11,30 @@ const createVideo = async (meta, file, user) => {
   console.log(storeResult);
   if (storeResult.success) {
     const ress = await createVideoMetaData(meta, shortenUrl, user);
-    const videoId = ress.data;
-    return {
+    if (ress.success) {
+      const videoId = ress.data;
+      return {
         success: true,
         message: "Upload File successful",
-        videoId: videoId
+        videoId: videoId,
+      };
+    } else {
+      return {
+        success: false,
+        message: ress.message
+      }
     }
   } else {
     return {
-        success: false,
-        message: storeResult.message
-    }
+      success: false,
+      message: storeResult.message,
+    };
   }
-  
 };
 
 const getViewerVideoList = async (data) => {
-  
   try {
-    console.log(data)
+    console.log(data);
     const page = parseInt(data.page) || 1;
     const pageSize = parseInt(data.pageSize) || 10;
     const result = await Video.findAndCountAll({
@@ -44,36 +50,35 @@ const getViewerVideoList = async (data) => {
     return {
       success: false,
       message: e,
-    }; 
+    };
   }
-}
+};
 
 const updateVideo = async (videoData, id) => {
   try {
     const video = await Video.findByPk(id);
     if (video) {
-      console.log(video)
-        const {title, description} = videoData;
-        video.title = title;
-        video.description = description;
-        await video.save();
-        return {
-            success: true,
-            data: video
-        }
+      console.log(video);
+      const { title, description } = videoData;
+      video.title = title;
+      video.description = description;
+      await video.save();
+      return {
+        success: true,
+        data: video,
+      };
     } else {
-        return {
-            success: false,
-            message: "Video is not found"
-        }
+      return {
+        success: false,
+        message: "Video is not found",
+      };
     }
   } catch (e) {
     return {
       success: false,
-      message: e
+      message: e,
+    };
   }
-  }
-  
 };
 
 const deleteVideoById = async (id) => {
@@ -81,50 +86,51 @@ const deleteVideoById = async (id) => {
     let video = await Video.findByPk(id);
     console.log(video.dataValues.id);
     if (video) {
-      console.log("ABC DEF")
-        video.status = VIDEO_STATUS.DELETED;
-        await video.save(); // Soft delete
-        return {
-            success: true,
-            data: video.dataValues,
-            message: "Delete Video successful"
-        }
+      console.log("ABC DEF");
+      video.status = VIDEO_STATUS.DELETED;
+      await video.save(); // Soft delete
+      return {
+        success: true,
+        data: video.dataValues,
+        message: "Delete Video successful",
+      };
     } else {
-        return {
-            success: false,
-            message: "Video is not found"
-        }
+      return {
+        success: false,
+        message: "Video is not found",
+      };
     }
   } catch (e) {
     return {
       success: false,
-      message: e
+      message: e,
+    };
   }
-  }
-  
 };
 
 const createVideoMetaData = async (meta, url, user) => {
   const video = {
-    ...meta,
+    title: meta.title || "",
+    description: meta.description || "",
     url: url,
     publisher_id: user.userId,
     status: VIDEO_STATUS.PUBLIC,
     views: 0,
   };
-
-  console.log(video)
   try {
+    console.log("Creating Videos");
     const videoId = await Video.create(video);
+    console.log(videoId);
     return {
       success: true,
       message: "Create Video successful",
-      data: videoId.id
+      data: videoId.id,
     };
   } catch (err) {
+    console.log("Some err happend");
     return {
       success: false,
-      message: err,
+      message: err.parent.sqlMessage,
     };
   }
 };
@@ -151,24 +157,57 @@ const storeVideo = (file, url) => {
 };
 
 const findVideoById = async (id) => {
-    const video = await Video.findByPk(id);
-    if (video) {
-        return {
-            success: true,
-            data: video.dataValues
-        }
-    } else {
-        return {
-            success: false,
-            message: "Video is not found"
-        }
-    }
-}
+  const video = await Video.findByPk(id);
+  if (video) {
+    return {
+      success: true,
+      data: video.dataValues,
+    };
+  } else {
+    return {
+      success: false,
+      message: "Video is not found",
+    };
+  }
+};
+
+const fullTextSearchVideo = async (keyword, page, pageSize) => {
+  try {
+    // Define your search query
+    const searchQuery = keyword;
+
+    // Use Sequelize's `findAll` method with a `where` clause for full-text search
+    const results = await Video.findAndCountAll({
+      where: {
+        [Sequelize.Op.or]: [
+          Sequelize.literal(
+            `MATCH(title, description) AGAINST('${searchQuery}' IN BOOLEAN MODE)`
+          ),
+        ],
+      },
+      page: page - 1,
+      limit: pageSize,
+    });
+
+    console.log("Search results:", results);
+    return {
+      success: true,
+      data: results,
+    };
+  } catch (error) {
+    console.error("Error performing search:", error);
+    return {
+      success: false,
+      message: error,
+    };
+  }
+};
 
 module.exports = {
   createVideo,
   findVideoById,
   updateVideo,
   deleteVideoById,
-  getViewerVideoList
+  getViewerVideoList,
+  fullTextSearchVideo,
 };
