@@ -9,7 +9,9 @@ const VIDEO_STATUS = {
 const NOTIFY_ACTION = {
     POST_VIDEO: 'Post Video',
     COMMENT: 'Comment',
-    SUBCRIBE: 'Subcribe'
+    SUBCRIBE: 'Subcribe',
+    REACT_LIKE: 'Like',
+    REACT_DISLIKE: 'Dislike'
 }
 
 const NOTIFY_STATUS = {
@@ -17,8 +19,14 @@ const NOTIFY_STATUS = {
     UN_READ: 'U'
 }
 
+const REACTION_TYPE = {
+    LIKE: 'L',
+    DISLIKE: 'D'
+}
+
 module.exports = {
     VIDEO_STATUS,
     NOTIFY_ACTION,
-    NOTIFY_STATUS
+    NOTIFY_STATUS,
+    REACTION_TYPE
 }
