@@ -16,7 +16,7 @@ const likeVideo = async (req, res, next) => {
       videoId: videoId,
       notifierId: 0,
     };
-    notifyService.createNotifications(params, NOTIFY_ACTION.REACT);
+    notifyService.createNotifications(params, NOTIFY_ACTION.REACT_LIKE);
     return res.status(200).json({
       success: true,
       message: "Reacted successful",
@@ -39,7 +39,7 @@ const dislikeVideo = async (req, res, next) => {
       videoId: videoId,
       notifierId: 0,
     };
-    notifyService.createNotifications(params, NOTIFY_ACTION.REACT);
+    notifyService.createNotifications(params, NOTIFY_ACTION.REACT_DISLIKE);
     return res.status(200).json({
       success: true,
       message: "Reacted successful",

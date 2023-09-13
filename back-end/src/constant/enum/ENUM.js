@@ -10,7 +10,8 @@ const NOTIFY_ACTION = {
     POST_VIDEO: 'Post Video',
     COMMENT: 'Comment',
     SUBCRIBE: 'Subcribe',
-    REACT: 'React'
+    REACT_LIKE: 'Like',
+    REACT_DISLIKE: 'Dislike'
 }
 
 const NOTIFY_STATUS = {
