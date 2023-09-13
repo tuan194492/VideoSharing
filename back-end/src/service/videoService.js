@@ -203,6 +203,16 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
   }
 };
 
+const addViewForVideo = async (videoId) => {
+  try {
+    const video = await Video.findByPk(videoId);
+    video.views++;
+    await video.save();
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   createVideo,
   findVideoById,
@@ -210,4 +220,5 @@ module.exports = {
   deleteVideoById,
   getViewerVideoList,
   fullTextSearchVideo,
+  addViewForVideo
 };
