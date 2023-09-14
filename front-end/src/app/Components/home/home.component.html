@@ -1,10 +1,16 @@
-<!-- <p>home works!</p> -->
-<app-video-card
-title="Why not me"
+<!-- <app-video-card 
+title='title'
 timestamp="2 days ago"
 channel="MusicUs"
-views="1111 + 'k views'"
+views=" views"
 image="/assets/wnm.jpg"
-live="true"
-
-></app-video-card>
+live="false"
+></app-video-card> -->
+<mat-grid-list cols="4">
+    <mat-grid-tile *ngFor="let v of videolist; let i = index" >
+        <app-video-card routerLinkActive="active current" [routerLink]="['/watchVideo',v.id]" title={{v.title}} timestamp=" 2 days ago" channel={{v.user_name}} views={{v.view}} image="/assets/wnm.jpg"
+        live="false">
+        </app-video-card>
+    </mat-grid-tile>
+ 
+</mat-grid-list>

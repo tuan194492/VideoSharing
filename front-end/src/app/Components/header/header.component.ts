@@ -3,6 +3,8 @@ import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import {MatDialog, MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
 import { LoginComponent } from '../dialogs/login/login.component';
+import { CreateVideoComponent } from '../dialogs/create-video/create-video.component';
+
  
 // import { AngularFireAuth } from '@angular/fire/auth';
 @Component({
@@ -30,7 +32,7 @@ export class HeaderComponent implements OnInit {
   
   @Output() changeState = new EventEmitter<boolean>();
   isLogin: boolean | undefined;
-  opened: boolean | undefined;
+  opened: boolean =false;
   
   changeEvent() {
     this.changeState.emit(!this.opened);
@@ -41,6 +43,16 @@ export class HeaderComponent implements OnInit {
       width:"500px",
       height:"500px",
       data: {email:this.email, password:this.password},
+    });
+    dialogRef.afterClosed().subscribe(result=>{
+      
+    })
+  }
+  openDialogCreateVideo(){
+    const dialogRef = this.dialog.open(CreateVideoComponent, {
+      width:"960px",
+      height:"400px",
+      // data: {email:this.email, password:this.password},
     });
     dialogRef.afterClosed().subscribe(result=>{
       

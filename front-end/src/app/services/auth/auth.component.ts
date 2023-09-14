@@ -10,7 +10,8 @@ import { Observable } from 'rxjs';
 export class AuthComponent implements OnInit {
   private httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type': 'application/json',
+      // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+      // 'Content-Type': 'application/json',
       // Authorization: 'my-auth-token',
       // Authorization: 'Basic ' + btoa('username:password'),
     }),
@@ -19,14 +20,20 @@ export class AuthComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  login(data:any): Observable<any>{
-    return this.http.post('http://localhost:3000/api/auth/login',data,this.httpOptions);
+  login(data: any): Observable<any> {
+    return this.http.post('http://localhost:3000/api/auth/login', data, this.httpOptions);
   }
-  register(data:any){
+  register(data: any) {
     //options
-    let options={
-        headers : new HttpHeaders().set("Content-Type","application/x-www-form-urlencoded")
-    }
-    return this.http.post("http://localhost:3000/api/auth/register",data,this.httpOptions);
-}
+    // let options = {
+    //   headers: new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded")
+    // }
+    
+    return this.http.post("http://localhost:3000/api/auth/register", data, this.httpOptions);
+  }
+  public setToken(token: string) {
+    localStorage.setItem('token', token);
+  }
+  
+
 }

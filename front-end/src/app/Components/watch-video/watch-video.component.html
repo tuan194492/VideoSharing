@@ -1,0 +1,87 @@
+<div class="grid-container">
+    <div class="left-column">
+      <div class="left-row" >
+        <video 
+        id="my-video"
+        class="video-js"
+        controls
+        preload="auto"
+        width="700"
+        height="450"
+        poster=""
+        data-setup="{}"
+      >
+        <source src="http://localhost:3000/api/video/stream/2" type="video/mp4" />
+        
+        <!-- <p class="vjs-no-js">
+          To view this video please enable JavaScript, and consider upgrading to a
+          web browser that
+          <a href="https://videojs.com/html5-video-support/" target="_blank"
+            >supports HTML5 video</a
+          >
+        </p> -->
+      </video>
+      <div class="detail" style="display: flex;">
+        <div style="margin-left: 80px;">
+          <h1 style="text-align:left">đahạdhakđạksa</h1>
+          <h3 style="text-align:left">sdhfsfksdfj</h3>
+        </div>
+        <div style="margin-left:50px ;margin-top: 20px;">
+          <button class="buttonDK" mat-button color="" >Đăng ký  </button>
+        </div>
+        <div style="display: flex; margin-left: 300px;margin-top: 20px;">
+          <div>
+            <button>
+              <span class="material-symbols-outlined">
+                thumb_up
+                </span>
+            </button>
+           
+              <p>1</p>
+          </div>
+          <div style="margin-left: 10px;">
+            <button>
+              <span class="material-symbols-outlined">
+                thumb_down
+                </span>
+            </button>
+         
+          </div>
+        </div>
+      
+
+      </div>
+     
+      
+      </div>
+      <div class="left-row">Hàng 2</div>
+    </div>
+    <div class="right-column">
+     
+            <app-video-card  [routerLink]="['/watchVideo']" title='title' timestamp=" 2 days ago" channel='buiducanh' views=1111 image="/assets/wnm.jpg"
+            live="false">
+            </app-video-card>
+            <app-video-card  [routerLink]="['/watchVideo']" title='title' timestamp=" 2 days ago" channel='buiducanh' views=1111 image="/assets/wnm.jpg"
+            live="false">
+            </app-video-card>
+            <app-video-card  [routerLink]="['/watchVideo']" title='title' timestamp=" 2 days ago" channel='buiducanh' views=1111 image="/assets/wnm.jpg"
+            live="false">
+            </app-video-card>
+       
+    </div>
+  </div>
+
+  <!-- <vg-player>
+    <video preload="auto" width='10' height='10' controls>
+      <source src="" type="video/mp4">
+    </video>
+  </vg-player>  -->
+ 
+<script src="https://vjs.zencdn.net/8.5.2/video.min.js"></script> 
+<!-- 
+
+<vg-player>
+  <video  #media id="singleVideo" preload="auto" controls>
+      <source src="http://localhost:3000/api/video/stream/2" type="video/mp4">
+  </video>
+</vg-player>  -->

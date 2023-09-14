@@ -1,13 +1,28 @@
 <!-- <h1>App</h1> -->
-<app-header></app-header>
+<app-header (changeState)="changeState($event)"></app-header>
 
 <mat-drawer-container class="example-container">
-    <mat-drawer mode="side" opened=" true">
-        <app-side-bar></app-side-bar>
-    </mat-drawer>
     <mat-drawer-content>
         <div style="text-align: center;min-height: 600px;">
             <router-outlet></router-outlet>
         </div>
     </mat-drawer-content>
-</mat-drawer-container>
+    <mat-drawer #sidenav mode="side"[(opened)]="opened">
+        <app-side-bar></app-side-bar>
+    </mat-drawer>
+   
+<!-- </mat-drawer-container>
+<mat-drawer-container class="example-container" autosize>
+    <mat-drawer #drawer class="example-sidenav" mode="side">
+      <p>Auto-resizing sidenav</p>
+    
+    
+    </mat-drawer>
+  
+    <div class="example-sidenav-content">
+      <button type="button" mat-button (click)="drawer.toggle()">
+        Toggle sidenav
+      </button>
+    </div>
+  
+  </mat-drawer-container> -->

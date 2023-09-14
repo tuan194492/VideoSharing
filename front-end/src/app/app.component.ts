@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatIconRegistry } from "@angular/material/icon";
 import { DomSanitizer } from "@angular/platform-browser";
 @Component({
@@ -17,4 +17,13 @@ export class AppComponent {
       this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/access_point.svg")
     );
   }
+  opened: boolean = true;
+  
+
+
+  changeState(event: boolean ) {
+    this.opened = event;
+    console.log('from app');
+  }
+
 }

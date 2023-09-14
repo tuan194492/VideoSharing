@@ -1,0 +1,13 @@
+<head style="display:flex">
+    <h1 >Tải video lên</h1>
+    <button mat-raised-button [matDialogClose]="" style="margin-left: auto;"><mat-icon style="color:red;">close</mat-icon></button>
+</head>
+
+<hr>
+<div>
+    <input type="text" (change)="getName(name.value)" #name ><br/>
+    <input type="text" (change)="getDescription(name.value)" #name ><br/>
+    <input type="file" (change)="getFile($event)"><br/>
+    <input type="button" value="Upload Video" (click)="submitData()">
+
+</div>

@@ -1,0 +1,48 @@
+/* CSS */
+.grid-container {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  /* Cột bên trái gấp 3 lần chiều rộng của cột bên phải */
+  gap: 10px;
+  /* Khoảng cách giữa các ô */
+  height: 100%;
+  /* Đảm bảo lưới có chiều cao 100% của parent */
+}
+
+.left-column {
+  display: grid;
+  grid-template-rows: auto auto;
+  /* Hai hàng tự động chiều cao */
+  gap: 10px;
+  /* Khoảng cách giữa các ô */
+}
+
+.left-row {
+  height: auto;
+  /* Chiều cao tự động cho tất cả các hàng trong cột bên trái */
+}
+
+.right-column {
+  height: auto;
+  /* Chiều cao tự động cho cột bên phải */
+}
+
+vg-player {
+  width: 100%;
+  height: 100%;
+}
+
+.video-js {
+  margin-top: 20px;
+  border: 2px solid gray;
+  border-radius: 12px;
+}
+
+.buttonDK {
+  border: 2px solid;
+  border-radius: 20px;
+  background-color: black; color:white
+}
+.buttonDK:hover{
+  opacity: 0.6;
+}

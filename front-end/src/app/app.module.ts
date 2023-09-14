@@ -18,13 +18,22 @@ import { VideoManageComponent } from './Components/video-manage/video-manage.com
 import {MatDialogModule} from '@angular/material/dialog';
 import { LoginComponent } from './Components/dialogs/login/login.component';
 import { RegisterComponent } from './Components/dialogs/register/register.component';
+import {CreateVideoComponent} from './Components/dialogs/create-video/create-video.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { AuthComponent } from './services/auth/auth.component';
-import { VideosComponent } from './services/videos/videos.component';
-import { CommentsComponent } from './services/comments/comments.component';
+import { VideoServiceComponent } from './services/video-service/video-service.component';
+import { CommentServiceComponent } from './services/comment-service/comment-service.component';
+import { WatchVideoComponent } from './Components/watch-video/watch-video.component';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {YouTubePlayerModule} from '@angular/youtube-player';
+import { VgCoreModule } from '@videogular/ngx-videogular/core';
+import { VgControlsModule } from '@videogular/ngx-videogular/controls';
+import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
+import { VgBufferingModule} from '@videogular/ngx-videogular/buffering'
+
 @NgModule({
   declarations: [
     HomeComponent,
@@ -37,8 +46,10 @@ import { CommentsComponent } from './services/comments/comments.component';
     LoginComponent,
     RegisterComponent,
     AuthComponent,
-    VideosComponent,
-    CommentsComponent,
+    CreateVideoComponent,
+    VideoServiceComponent,
+    CommentServiceComponent,
+    WatchVideoComponent,
 
   ],
   imports: [
@@ -49,8 +60,9 @@ import { CommentsComponent } from './services/comments/comments.component';
     MatIconModule, 
     BrowserModule,
     AppRoutingModule,
-    MatListModule,
-    MatDialogModule,MatFormFieldModule,MatButtonModule,MatInputModule,ReactiveFormsModule,FormsModule
+    MatListModule,YouTubePlayerModule,
+    MatDialogModule,MatFormFieldModule,MatButtonModule,MatInputModule,ReactiveFormsModule,FormsModule,MatGridListModule,
+    VgCoreModule,VgControlsModule,VgOverlayPlayModule,VgBufferingModule
   ],
   providers: [],
   bootstrap: [AppComponent]

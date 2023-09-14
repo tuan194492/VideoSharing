@@ -43,10 +43,14 @@ export class LoginComponent implements OnInit {
     if( this.loginForm.controls.email.value!=="" && this.loginForm.controls.password.value !==""){
       var account = {email : this.loginForm.controls.email.value , password : this.loginForm.controls.password.value}
       const loginAcount = JSON.stringify(account)
-      console.log("ac")
-      console.log(account)
-      this.httpService.login(loginAcount).subscribe(data=>{
+      console.log("login")
+      console.log(loginAcount)
+      this.httpService.login(account).subscribe(data=>{
+        console.log(data.token)
+        var dataString = String(data.token)
+        this.httpService.setToken(dataString)
         console.log(data)
+
       })
       this.closeDialog()
     }
@@ -57,8 +61,6 @@ closeDialog() {
   this.dialogRefLogin.close();
 }
 openDialogRegister(){
-  
-  
   const dialogRef = this.dialog.open(RegisterComponent, {
     width:"500px",
     height:"500px",
