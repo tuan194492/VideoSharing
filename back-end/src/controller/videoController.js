@@ -5,15 +5,19 @@ const cache = new NodeCache({ stdTTL: 15 * 60 });
 const videoService = require("../service/videoService");
 const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
-const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
-
+const loggingService = require("../service/loggingService");
+const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
+const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
-
-const getVideoDataById = async (req, res, next) => { };
+const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
   const file = req.files.file;
-  const meta = req.body;
+  const thumbnail = req.files.thumbnail;
+  const meta = {
+    ...req.body,
+    thumbnail
+  };
   console.log(req.user);
   const result = await videoService.createVideo(meta, file, req.user);
   if (result.success) {
@@ -84,60 +88,91 @@ const getVideoById = async (req, res, next) => {
 };
 
 const streamVideoById = async (req, res, next) => {
-  // console.log("Request from", req.socket);
+  try {
+    // console.log("Request from", req.socket);
+    const id = req.params.id;
+    console.log("Video id", id);
+    let videoPath = "";
+    // Can use cache to store url for Id video
+    if (!cache.has("videoId")) {
+      const videoPathResult = await videoService.findVideoById(id);
+      if (!videoPathResult.success) {
+        return res.status(404).json({
+          success: false,
+          message: "Can't not find video",
+        });
+      }
+      videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
+      cache.set("videoId", videoPath);
+    } else {
+      videoPath = cache.get("videoId");
+    }
 
-  const id = req.params.id;
-  let videoPath = "";
-  // Can use cache to store url for Id video
-  if (!cache.has("videoId")) {
-    const videoPathResult = await videoService.findVideoById(id);
-    if (!videoPathResult.success) {
-      return res.status(404).json({
+    const range = req.headers.range;
+    if (!range) {
+      return res.status(400).send("Requires Range header");
+    }
+    const videoSize = fs.statSync(videoPath).size;
+    const CHUNK_SIZE = 10 ** 6; // 1MB
+    const start = Number(range.replace(/\D/g, ""));
+    const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+    const contentLength = end - start + 1;
+    const headers = {
+      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+      "Accept-Ranges": "bytes",
+      "Content-Length": contentLength,
+      "Content-Type": "video/mp4",
+    };
+
+    res.writeHead(206, headers);
+    if (end > videoSize || start > videoSize) {
+      return res.status(400).json({
         success: false,
-        message: "Can't not find video",
+        message: err,
       });
     }
-    videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
-    cache.set("videoId", videoPath);
-  } else {
-    videoPath = cache.get("videoId");
-  }
+    const videoStream = fs.createReadStream(videoPath, { start, end });
+    console.log("Request from user", req.query?.userId);
+    if (req.query?.userId) {
+      if (!viewLogs.has(id)) {
+        viewLogs.set(id, new Map());
+      }
+      console.log(contentLength / videoSize);
+      console.log(
+        "Previous percent watched",
+        viewLogs.get(id).get(req.query?.userId) || 0
+      );
 
-  const range = req.headers.range;
-  if (!range) {
-    return res.status(400).send("Requires Range header");
-  }
-  const videoSize = fs.statSync(videoPath).size;
-  const CHUNK_SIZE = 10 ** 6; // 1MB
-  const start = Number(range.replace(/\D/g, ""));
-  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-  const contentLength = end - start + 1;
-  const headers = {
-    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-    "Accept-Ranges": "bytes",
-    "Content-Length": contentLength,
-    "Content-Type": "video/mp4",
-  };
+      console.log("Start and end", start, end);
 
-  res.writeHead(206, headers);
-  const videoStream = fs.createReadStream(videoPath, { start, end });
-  storingProgess.push({
-    video: id,
-    start: start,
-    end: end,
-    percentage: (end - start) / videoSize + storingProgess,
-    origin: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-    id: req.ip
-  })
-  console.log({
-    video: id,
-    start: start,
-    end: end,
-    percentage: (end - start) / videoSize,
-    origin: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-    ip: req.ip
-  })
-  videoStream.pipe(res);
+      viewLogs
+        .get(id)
+        .set(
+          req.query?.userId,
+          (viewLogs.get(id).get(req.query?.userId) || 0) +
+            contentLength / videoSize
+        );
+      console.log(
+        "Current percent watched",
+        viewLogs.get(id).get(req.query?.userId) || 0
+      );
+      if (viewLogs.get(id).get(req.query?.userId) > VIEW_COUNT_PERCENT) {
+        viewLogs.get(id).delete(req.query?.userId);
+        videoService.addViewForVideo(id);
+        loggingService.createLog({
+          userId: req.query?.userId,
+          action: USER_ACTION.WATCH,
+          videoId: id
+        })
+      }
+    }
+    videoStream.pipe(res);
+  } catch (err) {
+    return res.status(400).json({
+      success: false,
+      message: err,
+    });
+  }
 };
 
 const getViewerVideoList = async (req, res, next) => {
@@ -149,8 +184,8 @@ const getViewerVideoList = async (req, res, next) => {
       const user = await userService.getUserById(video.dataValues.publisher_id);
       videos.push({
         ...video.dataValues,
-        user_name: user?.name || "No name"
-      })
+        user_name: user?.name || "No name",
+      });
     }
     return res.status(200).json({
       success: true,
@@ -191,22 +226,26 @@ const getVideoByPublisherId = async (req, res, next) => {
 };
 
 const searchVideos = async (req, res, next) => {
-  let {keyword, page, pageSize} = req.body;
-  console.log("Searching video")
-  console.log(keyword)
-  const result = await videoService.fullTextSearchVideo(keyword, page || 1, pageSize || 10);
+  let { keyword, page, pageSize } = req.body;
+  console.log("Searching video");
+  console.log(keyword);
+  const result = await videoService.fullTextSearchVideo(
+    keyword,
+    page || 1,
+    pageSize || 10
+  );
   if (result.success) {
     return res.status(200).json({
       success: true,
-      data: result.data
-    })
+      data: result.data,
+    });
   } else {
     return res.status(400).json({
       success: false,
-      message: result.message
-    })
+      message: result.message,
+    });
   }
-}
+};
 
 module.exports = {
   createVideo,
@@ -217,5 +256,8 @@ module.exports = {
   streamVideoById,
   getViewerVideoList,
   searchVideos,
+<<<<<<< HEAD
   getVideoByPublisherId
+=======
+>>>>>>> 359ee28fa842bf32bee7ea4936253f4db73bf864
 };

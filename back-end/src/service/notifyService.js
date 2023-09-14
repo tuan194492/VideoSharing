@@ -46,6 +46,8 @@ const getNotifierList = async (actorId, videoId, notifierId, action) => {
     switch (action) {
         case NOTIFY_ACTION.SUBCRIBE:
             return [notifierId];
+        case NOTIFY_ACTION.REACT_LIKE:
+        case NOTIFY_ACTION.REACT_DISLIKE:
         case NOTIFY_ACTION.COMMENT:
             const channelId = (await videoService.findVideoById(videoId)).data.publisher_id;
             console.log(channelId)

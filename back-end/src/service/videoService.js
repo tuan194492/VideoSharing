@@ -141,12 +141,11 @@ const createVideoMetaData = async (meta, url, user) => {
     url: url,
     publisher_id: user.userId,
     status: VIDEO_STATUS.PUBLIC,
+    thumbnail: meta?.thumbnail.data,
     views: 0,
   };
   try {
-    console.log("Creating Videos");
     const videoId = await Video.create(video);
-    console.log(videoId);
     return {
       success: true,
       message: "Create Video successful",
@@ -229,6 +228,16 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
   }
 };
 
+const addViewForVideo = async (videoId) => {
+  try {
+    const video = await Video.findByPk(videoId);
+    video.views++;
+    await video.save();
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   createVideo,
   findVideoById,
@@ -236,5 +245,9 @@ module.exports = {
   deleteVideoById,
   getViewerVideoList,
   fullTextSearchVideo,
+<<<<<<< HEAD
   getVideoByPublisherId,
+=======
+  addViewForVideo
+>>>>>>> 359ee28fa842bf32bee7ea4936253f4db73bf864
 };

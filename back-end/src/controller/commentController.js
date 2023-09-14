@@ -3,7 +3,8 @@ const express = require("express");
 const videoService = require("../service/videoService");
 const commentService = require("../service/commentService");
 const notifyService = require("../service/notifyService");
-const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
+const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
+const loggingService = require("../service/loggingService");
 
 const getCommentsByVideo = async (req, res, next) => {
   const id = req.params.videoId;
@@ -51,6 +52,11 @@ const addComment = async (req, res, next) => {
       notifierId: 0,
     };
     notifyService.createNotifications(params, NOTIFY_ACTION.COMMENT);
+    loggingService.createLog({
+      userId: req.user.userId,
+      action: USER_ACTION.COMMENT,
+      videoId: videoId
+  });
     return res.status(200).json({
       success: true,
       message: result.message,
