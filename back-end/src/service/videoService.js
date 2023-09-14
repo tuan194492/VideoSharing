@@ -245,9 +245,6 @@ module.exports = {
   deleteVideoById,
   getViewerVideoList,
   fullTextSearchVideo,
-<<<<<<< HEAD
   getVideoByPublisherId,
-=======
   addViewForVideo
->>>>>>> 359ee28fa842bf32bee7ea4936253f4db73bf864
 };

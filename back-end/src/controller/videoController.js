@@ -256,8 +256,5 @@ module.exports = {
   streamVideoById,
   getViewerVideoList,
   searchVideos,
-<<<<<<< HEAD
   getVideoByPublisherId
-=======
->>>>>>> 359ee28fa842bf32bee7ea4936253f4db73bf864
 };
