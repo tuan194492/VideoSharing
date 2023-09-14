@@ -5,8 +5,9 @@ const cache = new NodeCache({ stdTTL: 15 * 60 });
 const videoService = require("../service/videoService");
 const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
-const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
-const VIEW_COUNT_PERCENT = 1.1;
+const loggingService = require("../service/loggingService");
+const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
+const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
 const getVideoDataById = async (req, res, next) => {};
 
@@ -158,6 +159,11 @@ const streamVideoById = async (req, res, next) => {
       if (viewLogs.get(id).get(req.query?.userId) > VIEW_COUNT_PERCENT) {
         viewLogs.get(id).delete(req.query?.userId);
         videoService.addViewForVideo(id);
+        loggingService.createLog({
+          userId: req.query?.userId,
+          action: USER_ACTION.WATCH,
+          videoId: id
+        })
       }
     }
     videoStream.pipe(res);
