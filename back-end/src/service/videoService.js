@@ -115,12 +115,11 @@ const createVideoMetaData = async (meta, url, user) => {
     url: url,
     publisher_id: user.userId,
     status: VIDEO_STATUS.PUBLIC,
+    thumbnail: meta?.thumbnail.data,
     views: 0,
   };
   try {
-    console.log("Creating Videos");
     const videoId = await Video.create(video);
-    console.log(videoId);
     return {
       success: true,
       message: "Create Video successful",

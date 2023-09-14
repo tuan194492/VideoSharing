@@ -12,7 +12,11 @@ const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
   const file = req.files.file;
-  const meta = req.body;
+  const thumbnail = req.files.thumbnail;
+  const meta = {
+    ...req.body,
+    thumbnail
+  };
   console.log(req.user);
   const result = await videoService.createVideo(meta, file, req.user);
   if (result.success) {

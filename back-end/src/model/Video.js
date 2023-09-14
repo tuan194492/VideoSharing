@@ -9,6 +9,7 @@ const Video = sequelize.define('Video', {
     keywords: DataTypes.STRING,
     status: DataTypes.CHAR,
     views: DataTypes.INTEGER,
+    thumbnail: DataTypes.BLOB('long'),
     created_at: DataTypes.DATE,   
   }, {
       indexes: [
