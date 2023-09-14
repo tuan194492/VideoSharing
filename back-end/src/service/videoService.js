@@ -54,6 +54,32 @@ const getViewerVideoList = async (data) => {
   }
 };
 
+const getVideoByPublisherId = async (data) => {
+  try {
+    console.log(data);
+    const page = parseInt(data.page) || 1;
+    const pageSize = parseInt(data.pageSize) || 10;
+    const result = await Video.findAndCountAll({
+      where: {
+        publisher_id: data.publisherId,
+
+      },
+      limit: pageSize,
+      offset: page - 1,
+    });
+    return {
+      success: true,
+      message: "Get video list successfull",
+      data: result,
+    };
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+    };
+  }
+};
+
 const updateVideo = async (videoData, id) => {
   try {
     const video = await Video.findByPk(id);
@@ -210,4 +236,5 @@ module.exports = {
   deleteVideoById,
   getViewerVideoList,
   fullTextSearchVideo,
+  getVideoByPublisherId,
 };

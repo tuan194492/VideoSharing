@@ -165,6 +165,31 @@ const getViewerVideoList = async (req, res, next) => {
   }
 };
 
+const getVideoByPublisherId = async (req, res, next) => {
+  const result = await videoService.getVideoByPublisherId(req.body);
+
+  if (result.success) {
+    let videos = [];
+    for (let video of result.data.rows) {
+      const user = await userService.getUserById(video.dataValues.publisher_id);
+      videos.push({
+        ...video.dataValues,
+        user_name: user?.name || "No name"
+      })
+    }
+    return res.status(200).json({
+      success: true,
+      count: result.data.count,
+      data: videos,
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
+
 const searchVideos = async (req, res, next) => {
   let {keyword, page, pageSize} = req.body;
   console.log("Searching video")
@@ -191,5 +216,6 @@ module.exports = {
   getVideoDataById,
   streamVideoById,
   getViewerVideoList,
-  searchVideos
+  searchVideos,
+  getVideoByPublisherId
 };
