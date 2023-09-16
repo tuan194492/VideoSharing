@@ -94,7 +94,7 @@ const streamVideoById = async (req, res, next) => {
     console.log("Video id", id);
     let videoPath = "";
     // Can use cache to store url for Id video
-    if (!cache.has("videoId")) {
+    if (!cache.has(id)) {
       const videoPathResult = await videoService.findVideoById(id);
       if (!videoPathResult.success) {
         return res.status(404).json({
@@ -103,9 +103,9 @@ const streamVideoById = async (req, res, next) => {
         });
       }
       videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
-      cache.set("videoId", videoPath);
+      cache.set(id, videoPath);
     } else {
-      videoPath = cache.get("videoId");
+      videoPath = cache.get(id);
     }
 
     const range = req.headers.range;
