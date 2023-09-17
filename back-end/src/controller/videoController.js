@@ -75,9 +75,13 @@ const getVideoById = async (req, res, next) => {
   const id = req.params.id;
   const result = await videoService.findVideoById(id);
   if (result.success) {
+    const user = await userService.getUserById(result.data.publisher_id);
     return res.status(200).json({
       success: true,
-      data: result.data,
+      data: {
+        ...result.data,
+        user_name: user?.name || "No name",
+      }
     });
   } else {
     return res.status(400).json({
