@@ -8,7 +8,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const bodyParser = require('body-parser');
 
 const {databaseInit} = require("../src/utils/database/index")
-
+const connectMongoDB = require("../src/utils/database/mongo");
 const app = express();
 const port = 3000;
 
@@ -71,6 +71,8 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 databaseInit();
 route(app);
+
+connectMongoDB();
 
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);

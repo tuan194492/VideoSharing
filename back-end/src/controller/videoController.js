@@ -5,14 +5,19 @@ const cache = new NodeCache({ stdTTL: 15 * 60 });
 const videoService = require("../service/videoService");
 const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
-const { NOTIFY_ACTION } = require("../constant/enum/ENUM");
-const VIEW_COUNT_PERCENT = 1.1;
+const loggingService = require("../service/loggingService");
+const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
+const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
 const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
   const file = req.files.file;
-  const meta = req.body;
+  const thumbnail = req.files.thumbnail;
+  const meta = {
+    ...req.body,
+    thumbnail
+  };
   console.log(req.user);
   const result = await videoService.createVideo(meta, file, req.user);
   if (result.success) {
@@ -89,7 +94,7 @@ const streamVideoById = async (req, res, next) => {
     console.log("Video id", id);
     let videoPath = "";
     // Can use cache to store url for Id video
-    if (!cache.has("videoId")) {
+    if (!cache.has(id)) {
       const videoPathResult = await videoService.findVideoById(id);
       if (!videoPathResult.success) {
         return res.status(404).json({
@@ -98,9 +103,9 @@ const streamVideoById = async (req, res, next) => {
         });
       }
       videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
-      cache.set("videoId", videoPath);
+      cache.set(id, videoPath);
     } else {
-      videoPath = cache.get("videoId");
+      videoPath = cache.get(id);
     }
 
     const range = req.headers.range;
@@ -154,6 +159,11 @@ const streamVideoById = async (req, res, next) => {
       if (viewLogs.get(id).get(req.query?.userId) > VIEW_COUNT_PERCENT) {
         viewLogs.get(id).delete(req.query?.userId);
         videoService.addViewForVideo(id);
+        loggingService.createLog({
+          userId: req.query?.userId,
+          action: USER_ACTION.WATCH,
+          videoId: id
+        })
       }
     }
     videoStream.pipe(res);
@@ -176,6 +186,31 @@ const getViewerVideoList = async (req, res, next) => {
         ...video.dataValues,
         user_name: user?.name || "No name",
       });
+    }
+    return res.status(200).json({
+      success: true,
+      count: result.data.count,
+      data: videos,
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
+
+const getVideoByPublisherId = async (req, res, next) => {
+  const result = await videoService.getVideoByPublisherId(req.body);
+
+  if (result.success) {
+    let videos = [];
+    for (let video of result.data.rows) {
+      const user = await userService.getUserById(video.dataValues.publisher_id);
+      videos.push({
+        ...video.dataValues,
+        user_name: user?.name || "No name"
+      })
     }
     return res.status(200).json({
       success: true,
@@ -221,4 +256,5 @@ module.exports = {
   streamVideoById,
   getViewerVideoList,
   searchVideos,
+  getVideoByPublisherId
 };

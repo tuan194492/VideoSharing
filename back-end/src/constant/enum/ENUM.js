@@ -6,6 +6,14 @@ const VIDEO_STATUS = {
     DELETED: 'DELETED'
 }
 
+const USER_ACTION = {
+    WATCH: 'WATCH',
+    SEARCH: 'SEARCH',
+    LIKE: 'LIKE',
+    DISLIKE: 'DISLIKE',
+    COMMENT: 'COMMENT'
+}
+
 const NOTIFY_ACTION = {
     POST_VIDEO: 'Post Video',
     COMMENT: 'Comment',
@@ -28,5 +36,6 @@ module.exports = {
     VIDEO_STATUS,
     NOTIFY_ACTION,
     NOTIFY_STATUS,
-    REACTION_TYPE
+    REACTION_TYPE,
+    USER_ACTION
 }

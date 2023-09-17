@@ -1,8 +1,9 @@
 const express = require("express");
 const Sequelize = require("sequelize");
 const Video = require("../model/Video");
+const Reaction = require("../model/Reaction");
 const fileUtils = require("../utils/video/FileUtils");
-const { VIDEO_STATUS } = require("../constant/enum/ENUM");
+const { VIDEO_STATUS, REACTION_TYPE } = require("../constant/enum/ENUM");
 
 const createVideo = async (meta, file, user) => {
   const url = fileUtils.createUrlForVideo(file, user);
@@ -38,6 +39,32 @@ const getViewerVideoList = async (data) => {
     const page = parseInt(data.page) || 1;
     const pageSize = parseInt(data.pageSize) || 10;
     const result = await Video.findAndCountAll({
+      limit: pageSize,
+      offset: page - 1,
+    });
+    return {
+      success: true,
+      message: "Get video list successfull",
+      data: result,
+    };
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+    };
+  }
+};
+
+const getVideoByPublisherId = async (data) => {
+  try {
+    console.log(data);
+    const page = parseInt(data.page) || 1;
+    const pageSize = parseInt(data.pageSize) || 10;
+    const result = await Video.findAndCountAll({
+      where: {
+        publisher_id: data.publisherId,
+
+      },
       limit: pageSize,
       offset: page - 1,
     });
@@ -115,12 +142,11 @@ const createVideoMetaData = async (meta, url, user) => {
     url: url,
     publisher_id: user.userId,
     status: VIDEO_STATUS.PUBLIC,
+    thumbnail: meta?.thumbnail.data,
     views: 0,
   };
   try {
-    console.log("Creating Videos");
     const videoId = await Video.create(video);
-    console.log(videoId);
     return {
       success: true,
       message: "Create Video successful",
@@ -157,18 +183,44 @@ const storeVideo = (file, url) => {
 };
 
 const findVideoById = async (id) => {
-  const video = await Video.findByPk(id);
-  if (video) {
-    return {
-      success: true,
-      data: video.dataValues,
-    };
-  } else {
+  try {
+    const video = await Video.findByPk(id);
+    if (video) {
+      const like = await Reaction.count({
+        where: {
+          video_id: id,
+          type: REACTION_TYPE.LIKE
+        }
+      });
+      const dislike = await Reaction.count({
+        where: {
+          video_id: id,
+          type: REACTION_TYPE.DISLIKE
+        }
+      })
+
+      return {
+        success: true,
+        data: {
+          ...video.dataValues,
+          likeCount: like,
+          dislikeCount: dislike
+        }
+      };
+    } else {
+      return {
+        success: false,
+        message: "Video is not found",
+      };
+    }
+  } catch (e) {
+    console.log(e)
     return {
       success: false,
-      message: "Video is not found",
+      message: "Video is not found " + e.parent.sqlMessage,
     };
   }
+
 };
 
 const fullTextSearchVideo = async (keyword, page, pageSize) => {
@@ -208,7 +260,7 @@ const addViewForVideo = async (videoId) => {
     const video = await Video.findByPk(videoId);
     video.views++;
     await video.save();
-  } catch(err) {
+  } catch (err) {
     console.log(err);
   }
 }
@@ -220,5 +272,6 @@ module.exports = {
   deleteVideoById,
   getViewerVideoList,
   fullTextSearchVideo,
+  getVideoByPublisherId,
   addViewForVideo
 };
