@@ -99,7 +99,7 @@ const streamVideoById = async (req, res, next) => {
     let videoPath = "";
     // Can use cache to store url for Id video
     if (!cache.has(id)) {
-      const videoPathResult = await videoService.findVideoById(id);
+      const videoPathResult = await videoService.findVideoById(id, req?.query?.userId);
       if (!videoPathResult.success) {
         return res.status(404).json({
           success: false,
