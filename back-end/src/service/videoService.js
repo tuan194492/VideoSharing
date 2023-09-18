@@ -1,8 +1,9 @@
 const express = require("express");
 const Sequelize = require("sequelize");
 const Video = require("../model/Video");
+const Reaction = require("../model/Reaction");
 const fileUtils = require("../utils/video/FileUtils");
-const { VIDEO_STATUS } = require("../constant/enum/ENUM");
+const { VIDEO_STATUS, REACTION_TYPE } = require("../constant/enum/ENUM");
 
 const createVideo = async (meta, file, user) => {
 	const url = fileUtils.createUrlForVideo(file, user);
@@ -182,18 +183,44 @@ const storeVideo = (file, url) => {
 };
 
 const findVideoById = async (id) => {
-	const video = await Video.findByPk(id);
-	if (video) {
-		return {
-			success: true,
-			data: video.dataValues,
-		};
-	} else {
-		return {
-			success: false,
-			message: "Video is not found",
-		};
-	}
+  try {
+    const video = await Video.findByPk(id);
+    if (video) {
+      const like = await Reaction.count({
+        where: {
+          video_id: id,
+          type: REACTION_TYPE.LIKE
+        }
+      });
+      const dislike = await Reaction.count({
+        where: {
+          video_id: id,
+          type: REACTION_TYPE.DISLIKE
+        }
+      })
+
+      return {
+        success: true,
+        data: {
+          ...video.dataValues,
+          likeCount: like,
+          dislikeCount: dislike
+        }
+      };
+    } else {
+      return {
+        success: false,
+        message: "Video is not found",
+      };
+    }
+  } catch (e) {
+    console.log(e)
+    return {
+      success: false,
+      message: "Video is not found " + e.parent.sqlMessage,
+    };
+  }
+
 };
 
 const fullTextSearchVideo = async (keyword, page, pageSize) => {
@@ -229,14 +256,14 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
 };
 
 const addViewForVideo = async (videoId) => {
-	try {
-		const video = await Video.findByPk(videoId);
-		video.views++;
-		await video.save();
-	} catch (err) {
-		console.log(err);
-	}
-};
+  try {
+    const video = await Video.findByPk(videoId);
+    video.views++;
+    await video.save();
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 module.exports = {
 	createVideo,

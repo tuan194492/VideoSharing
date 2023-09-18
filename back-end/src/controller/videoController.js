@@ -72,41 +72,45 @@ const deleteVideo = async (req, res, next) => {
 };
 
 const getVideoById = async (req, res, next) => {
-	const id = req.params.id;
-	const result = await videoService.findVideoById(id);
-	if (result.success) {
-		return res.status(200).json({
-			success: true,
-			data: result.data,
-		});
-	} else {
-		return res.status(400).json({
-			success: false,
-			message: result.message,
-		});
-	}
+  const id = req.params.id;
+  const result = await videoService.findVideoById(id);
+  if (result.success) {
+    const user = await userService.getUserById(result.data.publisher_id);
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...result.data,
+        user_name: user?.name || "No name",
+      }
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
 };
 
 const streamVideoById = async (req, res, next) => {
-	try {
-		// console.log("Request from", req.socket);
-		const id = req.params.id;
-		console.log("Video id", id);
-		let videoPath = "";
-		// Can use cache to store url for Id video
-		if (!cache.has("videoId")) {
-			const videoPathResult = await videoService.findVideoById(id);
-			if (!videoPathResult.success) {
-				return res.status(404).json({
-					success: false,
-					message: "Can't not find video",
-				});
-			}
-			videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
-			cache.set("videoId", videoPath);
-		} else {
-			videoPath = cache.get("videoId");
-		}
+  try {
+    // console.log("Request from", req.socket);
+    const id = req.params.id;
+    console.log("Video id", id);
+    let videoPath = "";
+    // Can use cache to store url for Id video
+    if (!cache.has(id)) {
+      const videoPathResult = await videoService.findVideoById(id);
+      if (!videoPathResult.success) {
+        return res.status(404).json({
+          success: false,
+          message: "Can't not find video",
+        });
+      }
+      videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
+      cache.set(id, videoPath);
+    } else {
+      videoPath = cache.get(id);
+    }
 
 		const range = req.headers.range;
 		if (!range) {
