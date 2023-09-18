@@ -6,6 +6,7 @@ const videoService = require("../service/videoService");
 const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
 const loggingService = require("../service/loggingService");
+const recommenderService = require("../service/recommenderService");
 const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
 const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
@@ -255,6 +256,13 @@ const searchVideos = async (req, res, next) => {
 	}
 };
 
+const getSimilarUsers = async (req, res, next) => {
+	await recommenderService.getSimilarUsers(req.params.userId);
+	return res.status(200).json({
+		data: 'hihi'
+	});
+}
+
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -265,4 +273,5 @@ module.exports = {
 	getViewerVideoList,
 	searchVideos,
 	getVideoByPublisherId,
+	getSimilarUsers
 };
