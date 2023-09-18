@@ -1,6 +1,7 @@
 const express = require("express");
 const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
+const { WatchedVideo } = require("../model/WatchedVideo");
 const { USER_ACTION_POINT, USER_ACTION } = require("../constant/enum/ENUM");
 /*
     Params:
@@ -16,6 +17,7 @@ const createLog = async (params) => {
 		videoId: params.videoId,
 	});
 	log.save();
+	// Change react point
 	const recommendPoint = await RecommendPoints.findOne({
 		userId: params.userId,
 		videoId: params.videoId,
@@ -30,6 +32,22 @@ const createLog = async (params) => {
 	} else {
 		recommendPoint.point = recommendPoint.point + getUserActionPoint(params.action);
 		recommendPoint.save();
+	}
+	// Log for watched video
+	const watchedVideo = await WatchedVideo.findOne({
+		userId: params.userId,
+		videoId: params.videoId,
+	}).exec();
+	if (!watchedVideo) {
+		const data = new WatchedVideo({
+			userId: params.userId,
+			timeWatched: 1,
+			videoId: params.videoId,
+		});
+		data.save();
+	} else {
+		watchedVideo.timeWatched = watchedVideo.timeWatched + 1;
+		watchedVideo.save();
 	}
 };
 
