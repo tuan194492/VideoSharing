@@ -4,6 +4,7 @@ const Video = require("../model/Video");
 const User = require("../model/User");
 const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
+const { WatchedVideo } = require("../model/WatchedVideo");
 
 let utilityMatrix, pointMatrix;
 let users = [];
@@ -93,15 +94,27 @@ const getUtilityMatrix = async () => {
 	return utilityMatrix;
 };
 
-const getSimilarUsers = async (userId) => {
+const getSimilarUsers = async (userId, numberOfUser) => {
 	const similarities = await getUtilityMatrix();
 	if (users.includes(userId)) {
 		const currentUserIndex = users.indexOf(userId);
-		console.log(similarities);
+		const similarVector = similarities[currentUserIndex];
+		const sortedArr = similarVector.sort();
+		return sortedArr.slice(0, numberOfUser);
 	} else {
 		return null;
 	}
 };
+
+const getMostInterestedVideoByUser = async (userId, numberOfVideo) => {
+	const interestedVideos = await RecommendPoints.find({
+		userId: userId
+	}).sort({
+		"point": -1
+	}).limit(numberOfVideo);
+	console.log(interestedVideos);
+	return interestedVideos.map(x => x.videoId);
+}
 
 const resetMatrix = () => {
 	utilityMatrix = [];
