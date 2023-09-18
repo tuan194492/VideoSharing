@@ -12,249 +12,253 @@ const viewLogs = new Map();
 const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
-  const file = req.files.file;
-  const thumbnail = req.files.thumbnail;
-  const meta = {
-    ...req.body,
-    thumbnail
-  };
-  console.log(req.user);
-  const result = await videoService.createVideo(meta, file, req.user);
-  if (result.success) {
-    const params = {
-      actorId: req.user.userId,
-      videoId: result.videoId,
-      notifierId: 0,
-    };
-    notifyService.createNotifications(params, NOTIFY_ACTION.POST_VIDEO);
-    return res.status(201).json({
-      message: "Upload video successful",
-    });
-  } else {
-    return res.status(500).json({
-      message: result.message,
-    });
-  }
+	const file = req.files.file;
+	const thumbnail = req.files.thumbnail;
+	const meta = {
+		...req.body,
+		thumbnail,
+	};
+	console.log(req.user);
+	const result = await videoService.createVideo(meta, file, req.user);
+	if (result.success) {
+		const params = {
+			actorId: req.user.userId,
+			videoId: result.videoId,
+			notifierId: 0,
+		};
+		notifyService.createNotifications(params, NOTIFY_ACTION.POST_VIDEO);
+		return res.status(201).json({
+			message: "Upload video successful",
+		});
+	} else {
+		return res.status(500).json({
+			message: result.message,
+		});
+	}
 };
 
 const updateVideo = async (req, res, next) => {
-  const id = req.params.id;
-  const result = await videoService.updateVideo(req.body, id);
-  if (result.success) {
-    return res.status(200).json({
-      success: true,
-      data: result.data,
-    });
-  } else {
-    return res.status(400).json({
-      success: false,
-      message: result.message,
-    });
-  }
+	const id = req.params.id;
+	const result = await videoService.updateVideo(req.body, id);
+	if (result.success) {
+		return res.status(200).json({
+			success: true,
+			data: result.data,
+		});
+	} else {
+		return res.status(400).json({
+			success: false,
+			message: result.message,
+		});
+	}
 };
 
 const deleteVideo = async (req, res, next) => {
-  const id = req.params.id;
-  const result = await videoService.deleteVideoById(id);
-  console.log(result);
-  if (result.success) {
-    return res.status(200).json({
-      success: true,
-      data: result.data,
-      message: "Delete Video successful",
-    });
-  } else {
-    return res.status(400).json({
-      success: false,
-      message: result.message,
-    });
-  }
+	const id = req.params.id;
+	const result = await videoService.deleteVideoById(id);
+	console.log(result);
+	if (result.success) {
+		return res.status(200).json({
+			success: true,
+			data: result.data,
+			message: "Delete Video successful",
+		});
+	} else {
+		return res.status(400).json({
+			success: false,
+			message: result.message,
+		});
+	}
 };
 
 const getVideoById = async (req, res, next) => {
-  const id = req.params.id;
-  const result = await videoService.findVideoById(id);
-  if (result.success) {
-    return res.status(200).json({
-      success: true,
-      data: result.data,
-    });
-  } else {
-    return res.status(400).json({
-      success: false,
-      message: result.message,
-    });
-  }
+	const id = req.params.id;
+	const result = await videoService.findVideoById(id);
+	if (result.success) {
+		return res.status(200).json({
+			success: true,
+			data: result.data,
+		});
+	} else {
+		return res.status(400).json({
+			success: false,
+			message: result.message,
+		});
+	}
 };
 
 const streamVideoById = async (req, res, next) => {
-  try {
-    // console.log("Request from", req.socket);
-    const id = req.params.id;
-    console.log("Video id", id);
-    let videoPath = "";
-    // Can use cache to store url for Id video
-    if (!cache.has("videoId")) {
-      const videoPathResult = await videoService.findVideoById(id);
-      if (!videoPathResult.success) {
-        return res.status(404).json({
-          success: false,
-          message: "Can't not find video",
-        });
-      }
-      videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
-      cache.set("videoId", videoPath);
-    } else {
-      videoPath = cache.get("videoId");
-    }
+	try {
+		// console.log("Request from", req.socket);
+		const id = req.params.id;
+		console.log("Video id", id);
+		let videoPath = "";
+		// Can use cache to store url for Id video
+		if (!cache.has("videoId")) {
+			const videoPathResult = await videoService.findVideoById(id);
+			if (!videoPathResult.success) {
+				return res.status(404).json({
+					success: false,
+					message: "Can't not find video",
+				});
+			}
+			videoPath = "public/" + videoPathResult.data.url; // back-end\public\1\sample.mp4
+			cache.set("videoId", videoPath);
+		} else {
+			videoPath = cache.get("videoId");
+		}
 
-    const range = req.headers.range;
-    if (!range) {
-      return res.status(400).send("Requires Range header");
-    }
-    const videoSize = fs.statSync(videoPath).size;
-    const CHUNK_SIZE = 10 ** 6; // 1MB
-    const start = Number(range.replace(/\D/g, ""));
-    const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-    const contentLength = end - start + 1;
-    const headers = {
-      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": contentLength,
-      "Content-Type": "video/mp4",
-    };
+		const range = req.headers.range;
+		if (!range) {
+			return res.status(400).send("Requires Range header");
+		}
+		const videoSize = fs.statSync(videoPath).size;
+		const CHUNK_SIZE = 10 ** 6; // 1MB
+		const start = Number(range.replace(/\D/g, ""));
+		const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+		const contentLength = end - start + 1;
+		const headers = {
+			"Content-Range": `bytes ${start}-${end}/${videoSize}`,
+			"Accept-Ranges": "bytes",
+			"Content-Length": contentLength,
+			"Content-Type": "video/mp4",
+		};
 
-    res.writeHead(206, headers);
-    if (end > videoSize || start > videoSize) {
-      return res.status(400).json({
-        success: false,
-        message: err,
-      });
-    }
-    const videoStream = fs.createReadStream(videoPath, { start, end });
-    console.log("Request from user", req.query?.userId);
-    if (req.query?.userId) {
-      if (!viewLogs.has(id)) {
-        viewLogs.set(id, new Map());
-      }
-      console.log(contentLength / videoSize);
-      console.log(
-        "Previous percent watched",
-        viewLogs.get(id).get(req.query?.userId) || 0
-      );
+		res.writeHead(206, headers);
+		if (end > videoSize || start > videoSize) {
+			return res.status(400).json({
+				success: false,
+				message: err,
+			});
+		}
+		const videoStream = fs.createReadStream(videoPath, { start, end });
+		console.log("Request from user", req.query?.userId);
+		if (req.query?.userId) {
+			if (!viewLogs.has(id)) {
+				viewLogs.set(id, new Map());
+			}
+			console.log(contentLength / videoSize);
+			console.log(
+				"Previous percent watched",
+				viewLogs.get(id).get(req.query?.userId) || 0
+			);
 
-      console.log("Start and end", start, end);
+			console.log("Start and end", start, end);
 
-      viewLogs
-        .get(id)
-        .set(
-          req.query?.userId,
-          (viewLogs.get(id).get(req.query?.userId) || 0) +
-            contentLength / videoSize
-        );
-      console.log(
-        "Current percent watched",
-        viewLogs.get(id).get(req.query?.userId) || 0
-      );
-      if (viewLogs.get(id).get(req.query?.userId) > VIEW_COUNT_PERCENT) {
-        viewLogs.get(id).delete(req.query?.userId);
-        videoService.addViewForVideo(id);
-        loggingService.createLog({
-          userId: req.query?.userId,
-          action: USER_ACTION.WATCH,
-          videoId: id
-        })
-      }
-    }
-    videoStream.pipe(res);
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      message: err,
-    });
-  }
+			viewLogs
+				.get(id)
+				.set(
+					req.query?.userId,
+					(viewLogs.get(id).get(req.query?.userId) || 0) +
+						contentLength / videoSize
+				);
+			console.log(
+				"Current percent watched",
+				viewLogs.get(id).get(req.query?.userId) || 0
+			);
+			if (viewLogs.get(id).get(req.query?.userId) > VIEW_COUNT_PERCENT) {
+				viewLogs.get(id).delete(req.query?.userId);
+				videoService.addViewForVideo(id);
+				loggingService.createLog({
+					userId: req.query?.userId,
+					action: USER_ACTION.WATCH,
+					videoId: id,
+				});
+			}
+		}
+		videoStream.pipe(res);
+	} catch (err) {
+		return res.status(400).json({
+			success: false,
+			message: err,
+		});
+	}
 };
 
 const getViewerVideoList = async (req, res, next) => {
-  const result = await videoService.getViewerVideoList(req.body);
+	const result = await videoService.getViewerVideoList(req.body);
 
-  if (result.success) {
-    let videos = [];
-    for (let video of result.data.rows) {
-      const user = await userService.getUserById(video.dataValues.publisher_id);
-      videos.push({
-        ...video.dataValues,
-        user_name: user?.name || "No name",
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      count: result.data.count,
-      data: videos,
-    });
-  } else {
-    return res.status(400).json({
-      success: false,
-      message: result.message,
-    });
-  }
+	if (result.success) {
+		let videos = [];
+		for (let video of result.data.rows) {
+			const user = await userService.getUserById(
+				video.dataValues.publisher_id
+			);
+			videos.push({
+				...video.dataValues,
+				user_name: user?.name || "No name",
+			});
+		}
+		return res.status(200).json({
+			success: true,
+			count: result.data.count,
+			data: videos,
+		});
+	} else {
+		return res.status(400).json({
+			success: false,
+			message: result.message,
+		});
+	}
 };
 
 const getVideoByPublisherId = async (req, res, next) => {
-  const result = await videoService.getVideoByPublisherId(req.body);
+	const result = await videoService.getVideoByPublisherId(req.params.publisherId);
 
-  if (result.success) {
-    let videos = [];
-    for (let video of result.data.rows) {
-      const user = await userService.getUserById(video.dataValues.publisher_id);
-      videos.push({
-        ...video.dataValues,
-        user_name: user?.name || "No name"
-      })
-    }
-    return res.status(200).json({
-      success: true,
-      count: result.data.count,
-      data: videos,
-    });
-  } else {
-    return res.status(400).json({
-      success: false,
-      message: result.message,
-    });
-  }
+	if (result.success) {
+		let videos = [];
+		for (let video of result.data.rows) {
+			const user = await userService.getUserById(
+				video.dataValues.publisher_id
+			);
+			videos.push({
+				...video.dataValues,
+				user_name: user?.name || "No name",
+			});
+		}
+		return res.status(200).json({
+			success: true,
+			count: result.data.count,
+			data: videos,
+		});
+	} else {
+		return res.status(400).json({
+			success: false,
+			message: result.message,
+		});
+	}
 };
 
 const searchVideos = async (req, res, next) => {
-  let { keyword, page, pageSize } = req.body;
-  console.log("Searching video");
-  console.log(keyword);
-  const result = await videoService.fullTextSearchVideo(
-    keyword,
-    page || 1,
-    pageSize || 10
-  );
-  if (result.success) {
-    return res.status(200).json({
-      success: true,
-      data: result.data,
-    });
-  } else {
-    return res.status(400).json({
-      success: false,
-      message: result.message,
-    });
-  }
+	let { keyword, page, pageSize } = req.body;
+	console.log("Searching video");
+	console.log(keyword);
+	const result = await videoService.fullTextSearchVideo(
+		keyword,
+		page || 1,
+		pageSize || 10
+	);
+	if (result.success) {
+		return res.status(200).json({
+			success: true,
+			data: result.data,
+		});
+	} else {
+		return res.status(400).json({
+			success: false,
+			message: result.message,
+		});
+	}
 };
 
 module.exports = {
-  createVideo,
-  updateVideo,
-  deleteVideo,
-  getVideoById,
-  getVideoDataById,
-  streamVideoById,
-  getViewerVideoList,
-  searchVideos,
-  getVideoByPublisherId
+	createVideo,
+	updateVideo,
+	deleteVideo,
+	getVideoById,
+	getVideoDataById,
+	streamVideoById,
+	getViewerVideoList,
+	searchVideos,
+	getVideoByPublisherId,
 };
