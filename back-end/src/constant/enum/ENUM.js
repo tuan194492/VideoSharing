@@ -14,6 +14,13 @@ const USER_ACTION = {
     COMMENT: 'COMMENT'
 }
 
+const USER_ACTION_POINT = {
+    WATCH: 1,
+    LIKE: 3,
+    DISLIKE: -3,
+    COMMENT: 5
+}
+
 const NOTIFY_ACTION = {
     POST_VIDEO: 'Post Video',
     COMMENT: 'Comment',
@@ -37,5 +44,6 @@ module.exports = {
     NOTIFY_ACTION,
     NOTIFY_STATUS,
     REACTION_TYPE,
-    USER_ACTION
+    USER_ACTION,
+    USER_ACTION_POINT
 }

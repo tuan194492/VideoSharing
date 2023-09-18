@@ -184,71 +184,74 @@ const storeVideo = (file, url) => {
 };
 
 const findVideoById = async (id, guestId) => {
-  try {
-	console.log(guestId)
-    const video = await Video.findByPk(id);
-    if (video) {
-      const like = await Reaction.count({
-        where: {
-          video_id: id,
-          type: REACTION_TYPE.LIKE
-        }
-      });
-      const dislike = await Reaction.count({
-        where: {
-          video_id: id,
-          type: REACTION_TYPE.DISLIKE
-        }
-      })
+	try {
+		console.log(guestId);
+		const video = await Video.findByPk(id);
+		if (video) {
+			const like = await Reaction.count({
+				where: {
+					video_id: id,
+					type: REACTION_TYPE.LIKE,
+				},
+			});
+			const dislike = await Reaction.count({
+				where: {
+					video_id: id,
+					type: REACTION_TYPE.DISLIKE,
+				},
+			});
+			let liked = false,
+				disliked = false,
+				subcribed = false;
+			if (guestId) {
+				liked = await Reaction.count({
+					where: {
+						video_id: id,
+						user_id: guestId,
+						type: REACTION_TYPE.LIKE,
+					},
+				});
 
-	  const liked = await Reaction.count({
-        where: {
-          video_id: id,
-		  user_id: guestId,
-          type: REACTION_TYPE.LIKE
-        }
-      });
+				disliked = await Reaction.count({
+					where: {
+						video_id: id,
+						user_id: guestId,
+						type: REACTION_TYPE.DISLIKE,
+					},
+				});
 
-	  const disliked = await Reaction.count({
-        where: {
-          video_id: id,
-		  user_id: guestId,
-          type: REACTION_TYPE.DISLIKE
-        }
-      });
+				subcribed = await Subcriber.count({
+					where: {
+						subscriber_id: guestId,
+						publisher_id: video.dataValues.publisher_id,
+					},
+				});
+			}
 
-	  const subcribed = await Subcriber.count({
-        where: {    
-		  subscriber_id: guestId,
-		  publisher_id: video.dataValues.publisher_id
-        }
-      });
-
-      return {
-        success: true,
-        data: {
-          ...video.dataValues,
-          likeCount: like,
-          dislikeCount: dislike,
-		  liked: liked > 0 ? true : false,
-		  subcribed: subcribed > 0 ? true : false,
-		  disliked: disliked > 0 ? true : false
-        }
-      };
-    } else {
-      return {
-        success: false,
-        message: "Video is not found",
-      };
-    }
-  } catch (e) {
-    console.log(e)
-    return {
-      success: false,
-      message: "Video is not found " + e.parent.sqlMessage,
-    };
-  }
-
+			return {
+				success: true,
+				data: {
+					...video.dataValues,
+					likeCount: like,
+					dislikeCount: dislike,
+					liked: liked > 0 ? true : false,
+					subcribed: subcribed > 0 ? true : false,
+					disliked: disliked > 0 ? true : false,
+				},
+			};
+		} else {
+			return {
+				success: false,
+				message: "Video is not found",
+			};
+		}
+	} catch (e) {
+		console.log(e);
+		return {
+			success: false,
+			message: "Video is not found " + e.parent.sqlMessage,
+		};
+	}
 };
 
 const fullTextSearchVideo = async (keyword, page, pageSize) => {
@@ -284,14 +287,14 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
 };
 
 const addViewForVideo = async (videoId) => {
-  try {
-    const video = await Video.findByPk(videoId);
-    video.views++;
-    await video.save();
-  } catch (err) {
-    console.log(err);
-  }
-}
+	try {
+		const video = await Video.findByPk(videoId);
+		video.views++;
+		await video.save();
+	} catch (err) {
+		console.log(err);
+	}
+};
 
 module.exports = {
 	createVideo,
