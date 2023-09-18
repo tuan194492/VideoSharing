@@ -73,7 +73,7 @@ const deleteVideo = async (req, res, next) => {
 
 const getVideoById = async (req, res, next) => {
   const id = req.params.id;
-  const result = await videoService.findVideoById(id);
+  const result = await videoService.findVideoById(id, req?.user?.userId);
   if (result.success) {
     const user = await userService.getUserById(result.data.publisher_id);
     return res.status(200).json({

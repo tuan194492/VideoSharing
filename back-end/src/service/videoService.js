@@ -2,6 +2,7 @@ const express = require("express");
 const Sequelize = require("sequelize");
 const Video = require("../model/Video");
 const Reaction = require("../model/Reaction");
+const Subcriber = require("../model/Subcriber");
 const fileUtils = require("../utils/video/FileUtils");
 const { VIDEO_STATUS, REACTION_TYPE } = require("../constant/enum/ENUM");
 
@@ -182,8 +183,9 @@ const storeVideo = (file, url) => {
 	});
 };
 
-const findVideoById = async (id) => {
+const findVideoById = async (id, guestId) => {
   try {
+	console.log(guestId)
     const video = await Video.findByPk(id);
     if (video) {
       const like = await Reaction.count({
@@ -199,12 +201,38 @@ const findVideoById = async (id) => {
         }
       })
 
+	  const liked = await Reaction.count({
+        where: {
+          video_id: id,
+		  user_id: guestId,
+          type: REACTION_TYPE.LIKE
+        }
+      });
+
+	  const disliked = await Reaction.count({
+        where: {
+          video_id: id,
+		  user_id: guestId,
+          type: REACTION_TYPE.DISLIKE
+        }
+      });
+
+	  const subcribed = await Subcriber.count({
+        where: {    
+		  subscriber_id: guestId,
+		  publisher_id: video.dataValues.publisher_id
+        }
+      });
+
       return {
         success: true,
         data: {
           ...video.dataValues,
           likeCount: like,
-          dislikeCount: dislike
+          dislikeCount: dislike,
+		  liked: liked > 0 ? true : false,
+		  subcribed: subcribed > 0 ? true : false,
+		  disliked: disliked > 0 ? true : false
         }
       };
     } else {
