@@ -47,7 +47,10 @@ const getUtilityMatrix = async () => {
 			}
 			points.push([users.indexOf(user), videos.indexOf(video), point]);
 		});
-		points = Array.from(Array(users.length), () => new Array(videos.length))
+		points = Array.from(
+			Array(users.length),
+			() => new Array(videos.length)
+		);
 		recommendPoints.forEach((data) => {
 			const user = data.userId;
 			const video = data.videoId;
@@ -100,7 +103,16 @@ const getSimilarUsers = async (userId) => {
 	}
 };
 
+const resetMatrix = () => {
+	utilityMatrix = [];
+	pointMatrix = [];
+	users = [];
+	videos = [];
+	points = [];
+};
+
 module.exports = {
 	getRecommendVideoListByUser,
 	getSimilarUsers,
+	resetMatrix
 };
