@@ -34,11 +34,14 @@ const getPopularVideo = async (numberOfVideo) => {
 };
 
 const getRecommendVideoByUser = async (userId) => {
-	const similarUsers = await getSimilarUsers(parseInt(userId), 3);
-	console.log("Similar Users List", similarUsers);
+	const similarUsers = await getSimilarUsers(parseInt(userId), 1);
+	console.debug("🚀🚀🚀 ~ file: recommenderService.js:38 ~ getRecommendVideoByUser ~ Similar UserID:", userId)
+	console.debug("🚀🚀🚀 ~ file: recommenderService.js:39 ~ getRecommendVideoByUser ~ similarUsers:", similarUsers)
 	const recommendVideos = [];
 	for (let user of similarUsers) {
 		const interestedVideos = await getMostInterestedVideoByUser(user, 5);
+		console.debug("🚀🚀🚀 ~ file: recommenderService.js:43 ~ getRecommendVideoByUser ~ user:", user)
+		console.debug("🚀🚀🚀 ~ file: recommenderService.js:43 ~ getRecommendVideoByUser ~ interestedVideos:", interestedVideos)
 		for (let video of interestedVideos) {
 			if (!recommendVideos.includes(video)) {
 				recommendVideos.push(video);
@@ -46,6 +49,7 @@ const getRecommendVideoByUser = async (userId) => {
 		}
 	}
 	console.log("Recommend Video", recommendVideos);
+	console.debug("🚀🚀🚀 ~ file: recommenderService.js:49 ~ getRecommendVideoByUser ~ recommendVideos:", recommendVideos)
 	return recommendVideos;
 };
 
@@ -131,8 +135,17 @@ const getSimilarUsers = async (userId, numberOfUser) => {
 		console.log("Yes it included");
 		const currentUserIndex = users.indexOf(userId);
 		const similarVector = similarities[currentUserIndex];
-		const sortedArr = similarVector.sort();
-		return sortedArr.slice(0, numberOfUser).map((n) => {
+		console.debug("🚀🚀🚀 ~ file: recommenderService.js:136 ~ getSimilarUsers ~ similarVector:", similarVector)
+		const sortedArr = similarVector.slice(0);
+		sortedArr.sort();
+		console.debug("🚀🚀🚀 ~ file: recommenderService.js:130 ~ getSimilarUsers ~ numberOfUser:", numberOfUser)
+		console.debug("🚀🚀🚀 ~ file: recommenderService.js:149 ~ returnsortedArr.slice ~ sortedArr.slice(1, 1 + parseInt(numberOfUser)):", sortedArr.slice(1, 1 + parseInt(numberOfUser)))
+		return sortedArr.slice(1, 1 + parseInt(numberOfUser)).map((n) => {
+			console.debug("🚀🚀🚀 ~ file: recommenderService.js:150 ~ returnsortedArr.slice ~ n:", n)
+			console.debug("🚀🚀🚀 ~ file: recommenderService.js:148 ~ returnsortedArr.slice ~ similarVector.indexOf(n):", similarVector.indexOf(n))
+			console.debug("🚀🚀🚀 ~ file: recommenderService.js:149 ~ returnsortedArr.slice ~ users:", users)
+			console.debug("🚀🚀🚀 ~ file: recommenderService.js:150 ~ returnsortedArr.slice ~ similarVector:", similarVector)
+
 			console.log(
 				"Index ",
 				similarVector.indexOf(n),
@@ -157,6 +170,7 @@ const getMostInterestedVideoByUser = async (userId, numberOfVideo) => {
 };
 
 const resetMatrix = () => {
+	console.debug("🚀🚀🚀 ~ file: recommenderService.js:161 ~ resetMatrix ~ Utility matrix Resetted")
 	utilityMatrix = [];
 	pointMatrix = [];
 	users = [];

@@ -76,9 +76,6 @@ route(app);
 
 connectMongoDB();
 
-setInterval(() => {
-  recommenderService.resetMatrix();
-}, 1000 * UPDATE_RECOMMEND_MINUTE)
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
 });
