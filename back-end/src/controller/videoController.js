@@ -257,7 +257,7 @@ const searchVideos = async (req, res, next) => {
 };
 
 const getSimilarUsers = async (req, res, next) => {
-	const videos = await recommenderService.getRecommendVideoByUser(req.params.userId);
+	const videos = await recommenderService.getRecommendVideoListByUser(req.params.userId);
 	return res.status(200).json({
 		data: 'hihi',
 		videos: videos

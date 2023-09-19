@@ -5,36 +5,40 @@ const User = require("../model/User");
 const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
+const videoService = require("./videoService");
 
 let utilityMatrix, pointMatrix;
 let users = [];
 let videos = [];
 let points = [];
 
-const getRecommendVideoListByUser = (userId) => {
-	Promise.all(getPopularVideo(5), getRecommendVideoByUser)
-		.then((values) => {
-			const popularVideos = values[0];
-			const recommendVideos = values[1];
-			return combinePopularWithRecommendVideo(
-				popularVideos,
-				recommendVideos
-			);
-		})
-		.catch((err) => {
-			console.log(err);
-			return [];
-		});
+const getRecommendVideoListByUser = async (userId) => {
+	try {
+		const values = await Promise.all([
+			getPopularVideo(5),
+			getRecommendVideoByUser(userId),
+		]);
+		console.log("VIDEOOOOOOOOOOOO", values);
+		const popularVideos = values[0];
+		const recommendVideos = values[1];
+		return combinePopularWithRecommendVideo(popularVideos, recommendVideos);
+	} catch (err) {
+		console.log(err);
+		return [];
+	}
 };
 
-const getPopularVideo = async (numberOfVideo) => {};
+const getPopularVideo = async (numberOfVideo) => {
+	const videos = await videoService.getMostWatchedVideos(numberOfVideo);
+	return videos;
+};
 
 const getRecommendVideoByUser = async (userId) => {
 	const similarUsers = await getSimilarUsers(parseInt(userId), 3);
 	console.log("Similar Users List", similarUsers);
 	const recommendVideos = [];
 	for (let user of similarUsers) {
-		const interestedVideos = await getMostInterestedVideoByUser(user, 3);
+		const interestedVideos = await getMostInterestedVideoByUser(user, 5);
 		for (let video of interestedVideos) {
 			if (!recommendVideos.includes(video)) {
 				recommendVideos.push(video);
@@ -45,7 +49,20 @@ const getRecommendVideoByUser = async (userId) => {
 	return recommendVideos;
 };
 
-const combinePopularWithRecommendVideo = (popularVideos, recommendVideos) => {};
+const combinePopularWithRecommendVideo = (popularVideos, recommendVideos) => {
+	const videos = [];
+	for (let video of popularVideos) {
+		if (!videos.includes(video)) {
+			videos.push(video);
+		}
+	}
+	for (let video of recommendVideos) {
+		if (!videos.includes(video)) {
+			videos.push(video);
+		}
+	}
+	return videos;
+};
 
 const getUtilityMatrix = async () => {
 	if (!utilityMatrix) {
@@ -62,9 +79,8 @@ const getUtilityMatrix = async () => {
 			}
 			points.push([users.indexOf(user), videos.indexOf(video), point]);
 		});
-		points = Array.from(
-			Array(users.length),
-			() => new Array(videos.length).fill(0)
+		points = Array.from(Array(users.length), () =>
+			new Array(videos.length).fill(0)
 		);
 		recommendPoints.forEach((data) => {
 			const user = data.userId;
@@ -110,15 +126,19 @@ const getUtilityMatrix = async () => {
 
 const getSimilarUsers = async (userId, numberOfUser) => {
 	const similarities = await getUtilityMatrix();
-	console.log("Users list", users, userId)
+	console.log("Users list", users, userId);
 	if (users.includes(userId)) {
-		console.log("Yes it included")
+		console.log("Yes it included");
 		const currentUserIndex = users.indexOf(userId);
 		const similarVector = similarities[currentUserIndex];
 		const sortedArr = similarVector.sort();
-		return sortedArr.slice(0, numberOfUser).map(n => {
-			console.log("Index ", similarVector.indexOf(n) , users[similarVector.indexOf(n)]);
-			return users[similarVector.indexOf(n)]
+		return sortedArr.slice(0, numberOfUser).map((n) => {
+			console.log(
+				"Index ",
+				similarVector.indexOf(n),
+				users[similarVector.indexOf(n)]
+			);
+			return users[similarVector.indexOf(n)];
 		});
 	} else {
 		return [];
@@ -127,13 +147,14 @@ const getSimilarUsers = async (userId, numberOfUser) => {
 
 const getMostInterestedVideoByUser = async (userId, numberOfVideo) => {
 	const interestedVideos = await RecommendPoints.find({
-		userId: userId
-	}).sort({
-		"point": -1
-	}).limit(numberOfVideo);
-	console.log(interestedVideos);
-	return interestedVideos.map(x => x.videoId);
-}
+		userId: userId,
+	})
+		.sort({
+			point: -1,
+		})
+		.limit(numberOfVideo);
+	return interestedVideos.map((x) => x.videoId);
+};
 
 const resetMatrix = () => {
 	utilityMatrix = [];
@@ -147,5 +168,5 @@ module.exports = {
 	getRecommendVideoListByUser,
 	getSimilarUsers,
 	resetMatrix,
-	getRecommendVideoByUser
+	getRecommendVideoByUser,
 };

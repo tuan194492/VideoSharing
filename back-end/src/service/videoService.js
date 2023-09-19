@@ -296,6 +296,22 @@ const addViewForVideo = async (videoId) => {
 	}
 };
 
+const getMostWatchedVideos = async (videoNumbers) => {
+	try {
+		const videos = await Video.findAll({
+			order: [
+				['views', 'DESC']
+			],
+			limit: parseInt(videoNumbers) 
+		})
+
+		return videos.map(video => video.id);
+	} catch (err) {
+		console.log(err);
+		return [];
+	}
+}
+
 module.exports = {
 	createVideo,
 	findVideoById,
@@ -305,4 +321,5 @@ module.exports = {
 	fullTextSearchVideo,
 	getVideoByPublisherId,
 	addViewForVideo,
+	getMostWatchedVideos
 };
