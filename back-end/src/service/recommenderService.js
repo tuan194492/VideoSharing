@@ -29,7 +29,21 @@ const getRecommendVideoListByUser = (userId) => {
 
 const getPopularVideo = async (numberOfVideo) => {};
 
-const getRecommendVideoByUser = async (userId) => {};
+const getRecommendVideoByUser = async (userId) => {
+	const similarUsers = await getSimilarUsers(parseInt(userId), 3);
+	console.log("Similar Users List", similarUsers);
+	const recommendVideos = [];
+	for (let user of similarUsers) {
+		const interestedVideos = await getMostInterestedVideoByUser(user, 3);
+		for (let video of interestedVideos) {
+			if (!recommendVideos.includes(video)) {
+				recommendVideos.push(video);
+			}
+		}
+	}
+	console.log("Recommend Video", recommendVideos);
+	return recommendVideos;
+};
 
 const combinePopularWithRecommendVideo = (popularVideos, recommendVideos) => {};
 
@@ -50,7 +64,7 @@ const getUtilityMatrix = async () => {
 		});
 		points = Array.from(
 			Array(users.length),
-			() => new Array(videos.length)
+			() => new Array(videos.length).fill(0)
 		);
 		recommendPoints.forEach((data) => {
 			const user = data.userId;
@@ -96,13 +110,18 @@ const getUtilityMatrix = async () => {
 
 const getSimilarUsers = async (userId, numberOfUser) => {
 	const similarities = await getUtilityMatrix();
+	console.log("Users list", users, userId)
 	if (users.includes(userId)) {
+		console.log("Yes it included")
 		const currentUserIndex = users.indexOf(userId);
 		const similarVector = similarities[currentUserIndex];
 		const sortedArr = similarVector.sort();
-		return sortedArr.slice(0, numberOfUser);
+		return sortedArr.slice(0, numberOfUser).map(n => {
+			console.log("Index ", similarVector.indexOf(n) , users[similarVector.indexOf(n)]);
+			return users[similarVector.indexOf(n)]
+		});
 	} else {
-		return null;
+		return [];
 	}
 };
 
@@ -127,5 +146,6 @@ const resetMatrix = () => {
 module.exports = {
 	getRecommendVideoListByUser,
 	getSimilarUsers,
-	resetMatrix
+	resetMatrix,
+	getRecommendVideoByUser
 };
