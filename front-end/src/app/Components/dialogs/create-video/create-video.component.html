@@ -5,9 +5,39 @@
 
 <hr>
 <div>
-    <input type="text" (change)="getName(name.value)" #name ><br/>
+    <!-- <input type="text" (change)="getName(name.value)" #name ><br/>
     <input type="text" (change)="getDescription(name.value)" #name ><br/>
     <input type="file" (change)="getFile($event)"><br/>
-    <input type="button" value="Upload Video" (click)="submitData()">
+    <input type="button" value="Upload Video" (click)="submitData()"> -->
 
+
+    <mat-dialog-content>
+        <header>
+         
+        </header>
+        <p>
+            <mat-form-field>
+                <mat-label>Title</mat-label>
+                <input matInput   type="text" (change)="getName(name.value)" #name required>
+                <mat-icon matSuffix>name</mat-icon>
+            </mat-form-field>
+            
+        </p>
+        <p>
+            <mat-form-field>
+                <mat-label>Description</mat-label>
+                <input matInput  type="text" (change)="getDescription(name.value)" #name required>
+                <!-- <mat-icon matSuffix>password</mat-icon> -->
+            </mat-form-field>
+           
+        </p>
+       
+    </mat-dialog-content>
+    <span>Chọn file thumbnail</span>
+    <br>
+    <input type="file" (change)="getThumbnail($event)"><br/>
+    <span>Chọn file video</span><br>
+    <input type="file" (change)="getFile($event)"><br/>
+    <!-- <input type="button" value="Upload Video" (click)="submitData()"> -->
+    <button mat-raised-button [matDialogClose]="" (click)="submitData()" color="primary" >Upload Video</button>
 </div>

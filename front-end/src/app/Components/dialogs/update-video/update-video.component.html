@@ -1,0 +1,25 @@
+<p>update-video works!</p>
+
+<mat-dialog-content>
+    <header>
+     
+    </header>
+    <p>
+        <mat-form-field>
+            <mat-label>Title</mat-label>
+            <input matInput placeholder="{{data.title}}"  type="text" (change)="getName(name.value)" #name required>
+            <mat-icon matSuffix>name</mat-icon>
+        </mat-form-field>
+        
+    </p>
+    <p>
+        <mat-form-field>
+            <mat-label>Description</mat-label>
+            <input matInput placeholder="{{data.description}}"  type="text" (change)="getDescription(name.value)" #name required>
+            <!-- <mat-icon matSuffix>password</mat-icon> -->
+        </mat-form-field>
+    </p>
+    <br>
+    <button mat-raised-button [matDialogClose]="" (click)="submitData()" color="primary" >Update Video</button>
+   
+</mat-dialog-content>

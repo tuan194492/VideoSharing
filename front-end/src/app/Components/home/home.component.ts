@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit {
 this.getAll()
   }
   getAll() {
-    console.log('1');
+    
     this.videos.getlistVideos().subscribe((res: any) => {
       console.log(res.data);
       this.videolist = res.data;

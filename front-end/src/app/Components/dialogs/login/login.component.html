@@ -3,6 +3,7 @@
         <header>
             <h1>Đăng nhập</h1>
         </header>
+        <hr>
         <p>
             <mat-form-field>
                 <input matInput [(ngModel)]="data.email" placeholder="email" type="email" formControlName="email" required>
@@ -18,10 +19,11 @@
             <span class ="errorMessage1">{{errorLoginPass}}</span>
         </p>
     </mat-dialog-content>
-<button mat-raised-button  type="submit" color="primary">Đăng nhập</button>
-</form>
-<mat-dialog-actions>
-<button mat-raised-button [matDialogClose]="" color="primary" (click)='openDialogRegister()'>Đăng ký</button>
-<button mat-raised-button [matDialogClose]="" color="warn">Quên mật khẩu</button>
+    <mat-dialog-actions style="display: flex;">
+        <button mat-raised-button  type="submit" color="primary">Đăng nhập</button>
+        <button mat-raised-button [matDialogClose]="" color="primary" (click)='openDialogRegister()'>Đăng ký</button>
+        <button mat-raised-button [matDialogClose]="" color="warn">Quên mật khẩu</button>
+        
+        </mat-dialog-actions>
 
-</mat-dialog-actions>
+</form>

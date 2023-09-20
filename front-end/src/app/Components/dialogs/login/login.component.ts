@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AuthComponent } from 'src/app/services/auth/auth.component';
+import { AuthserviceService } from 'src/app/services/authservice.service';
 import { RegisterComponent } from '../register/register.component';
 export interface DialogData {
   email: string;
@@ -22,7 +23,7 @@ export class LoginComponent implements OnInit {
     public dialog: MatDialog,
     public dialogRefLogin: MatDialogRef<LoginComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private httpService :AuthComponent) { }
+    private httpService :AuthserviceService) { }
   loginForm = this.formBuilder.group({
     email: [''],
     password: [''],
@@ -50,8 +51,10 @@ export class LoginComponent implements OnInit {
         var dataString = String(data.token)
         this.httpService.setToken(dataString)
         console.log(data)
+        this.httpService.setUserId(data.user.id)
 
       })
+      
       this.closeDialog()
     }
 

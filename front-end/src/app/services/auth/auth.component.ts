@@ -17,7 +17,6 @@ export class AuthComponent implements OnInit {
     }),
   };
   constructor(private http: HttpClient) { }
-
   ngOnInit(): void {
   }
   login(data: any): Observable<any> {
@@ -28,12 +27,20 @@ export class AuthComponent implements OnInit {
     // let options = {
     //   headers: new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded")
     // }
-    
+
     return this.http.post("http://localhost:3000/api/auth/register", data, this.httpOptions);
   }
   public setToken(token: string) {
     localStorage.setItem('token', token);
   }
-  
-
+  idUser: string = '';
+  setUserId(data: string){
+    this.idUser=data;
+   console.log(data);
+  }
+  getUserId() {
+    console.log('alo')
+    console.log(this.idUser);
+    return this.idUser;
+  }
 }

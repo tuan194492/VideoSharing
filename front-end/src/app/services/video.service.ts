@@ -1,14 +1,13 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-@Component({
-  selector: 'app-video-service',
-  templateUrl: './video-service.component.html',
-  styleUrls: ['./video-service.component.scss']
+@Injectable({
+  providedIn: 'root'
 })
-export class VideoServiceComponent implements OnInit {
+export class VideoService {
 
+  
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
@@ -27,6 +26,13 @@ export class VideoServiceComponent implements OnInit {
     });
     return this.http.post("http://localhost:3000/api/video", data, { headers });
   }
+  updateVideo(data: any, id: string) {
+    const url = 'http://localhost:3000/api/video/'+id;
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    });
+    return this.http.put(url, data, { headers });
+  }
   getlistVideos(): Observable<any> {
     return this.http.get<any>('http://localhost:3000/api/video/watch');
   }
@@ -42,18 +48,15 @@ export class VideoServiceComponent implements OnInit {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     });
-    const url = 'http://localhost:3000/api/react/like/1'+id;
-    return this.http.get<any>(url,{ headers });
+    const url = 'http://localhost:3000/api/react/like/'+id;
+    return this.http.post(url,{},{ headers });
   
   }
   disLikeVideo(id:string): Observable<any>{
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     });
-    const url = 'http://localhost:3000/api/react/like/1'+id;
-    return this.http.get<any>(url,{ headers });
-  
+    const url = 'http://localhost:3000/api/react/dislike/'+id;
+    return this.http.post(url,{},{ headers });
   }
-  
- 
 }

@@ -10,8 +10,12 @@
         height="450"
         poster=""
         data-setup="{}"
+        autoplay="true"
       >
-        <source src="http://localhost:3000/api/video/stream/2" type="video/mp4" />
+        <source src={{src}} type="video/mp4" />
+        <!-- <source src= 'http://localhost:3000/api/video/stream/2' type="video/mp4" /> -->
+        <!-- <source src= 'https://www.youtube.com/watch?v=30KI5SuECuc' /> -->
+
         
         <!-- <p class="vjs-no-js">
           To view this video please enable JavaScript, and consider upgrading to a
@@ -21,52 +25,80 @@
           >
         </p> -->
       </video>
-      <div class="detail" style="display: flex;">
+      <div style="margin-left: 80px;">
+        <h1 style="text-align:left">{{video.title}}</h1>
+      </div>
+      <div class="detail" style="display: flex;position: relative">
         <div style="margin-left: 80px;">
-          <h1 style="text-align:left">đahạdhakđạksa</h1>
-          <h3 style="text-align:left">sdhfsfksdfj</h3>
+          <h3 style="text-align:left">{{video.user_name}}</h3>
         </div>
-        <div style="margin-left:50px ;margin-top: 20px;">
-          <button class="buttonDK" mat-button color="" >Đăng ký  </button>
+        <div style="margin-left:50px ;">
+          <button class="buttonDK" mat-button color="" (click)="subcribe()">{{subcribeText}} </button>
         </div>
-        <div style="display: flex; margin-left: 300px;margin-top: 20px;">
+        <div style="display: flex;position: absolute; right: 100px;">
           <div>
-            <button>
-              <span class="material-symbols-outlined">
+            <button (click)="changeLikeColor()">
+              <span class="material-symbols-outlined" [style.color]="currentLikeColor">
                 thumb_up
                 </span>
             </button>
-           
-              <p>1</p>
+            <p>{{video.likeCount}}</p>
           </div>
           <div style="margin-left: 10px;">
-            <button>
-              <span class="material-symbols-outlined">
+            <button (click)="changeDislikeLikeColor()">
+              <span class="material-symbols-outlined" [style.color]="currentDisLikeColor">
                 thumb_down
                 </span>
             </button>
-         
+            <p>{{video.dislikeCount}}</p>
+
           </div>
         </div>
-      
-
+       
       </div>
      
-      
+      <div class="decreption" style="margin-left: 80px; margin-right: 100px;">
+        {{video.description}}
+                     </div>
+      <hr style="margin-left: 80px; margin-right: 80px;"> 
       </div>
-      <div class="left-row">Hàng 2</div>
+      <div class="left-row">
+        <header><h1>
+          Bình Luận
+        </h1></header>
+        <p>
+          <mat-form-field style=" width: 80%" >
+              <mat-label>Comment</mat-label>
+              <input matInput placeholder="Viết bình luận ..."  type="text" (change)="getcomment(comment.value)" #comment required>
+              <mat-icon matSuffix>name</mat-icon>
+          </mat-form-field>
+          <br>
+          <button mat-raised-button (click)="submitData()" color="primary" >Bình luận</button>
+          
+      </p>
+      <br>
+      <div style="margin-left: 80px; margin-right: 80px;" *ngFor="let c of commentList; let i = index"  >
+        <div style="text-align: left;"><strong>{{c.user_id}}</strong></div>
+       <div  style="text-align: left;">{{c.value}}</div>
+       <br>
+      </div>
+      </div>
     </div>
     <div class="right-column">
+      <mat-grid-list cols="1">
+        <mat-grid-tile *ngFor="let v of videolist; let i = index" >
+            <app-video-card routerLinkActive="active current" [routerLink]="['/watchVideo',v.id]" 
+            title={{v.title}} 
+            timestamp=" 2 days ago" 
+            channel={{v.user_name}} 
+            views={{v.view}} 
+            image="http://localhost:3000/api/video/stream/{{v.id}}"
+            live="false">
+           
+            </app-video-card>
+        </mat-grid-tile>
      
-            <app-video-card  [routerLink]="['/watchVideo']" title='title' timestamp=" 2 days ago" channel='buiducanh' views=1111 image="/assets/wnm.jpg"
-            live="false">
-            </app-video-card>
-            <app-video-card  [routerLink]="['/watchVideo']" title='title' timestamp=" 2 days ago" channel='buiducanh' views=1111 image="/assets/wnm.jpg"
-            live="false">
-            </app-video-card>
-            <app-video-card  [routerLink]="['/watchVideo']" title='title' timestamp=" 2 days ago" channel='buiducanh' views=1111 image="/assets/wnm.jpg"
-            live="false">
-            </app-video-card>
+    </mat-grid-list>
        
     </div>
   </div>

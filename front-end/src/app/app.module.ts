@@ -25,7 +25,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { AuthComponent } from './services/auth/auth.component';
 import { VideoServiceComponent } from './services/video-service/video-service.component';
-import { CommentServiceComponent } from './services/comment-service/comment-service.component';
 import { WatchVideoComponent } from './Components/watch-video/watch-video.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {YouTubePlayerModule} from '@angular/youtube-player';
@@ -33,6 +32,8 @@ import { VgCoreModule } from '@videogular/ngx-videogular/core';
 import { VgControlsModule } from '@videogular/ngx-videogular/controls';
 import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
 import { VgBufferingModule} from '@videogular/ngx-videogular/buffering'
+import {MatTableModule} from '@angular/material/table';
+import { UpdateVideoComponent } from './Components/dialogs/update-video/update-video.component';
 
 @NgModule({
   declarations: [
@@ -48,9 +49,8 @@ import { VgBufferingModule} from '@videogular/ngx-videogular/buffering'
     AuthComponent,
     CreateVideoComponent,
     VideoServiceComponent,
-    CommentServiceComponent,
     WatchVideoComponent,
-
+    UpdateVideoComponent
   ],
   imports: [
     // YouTubePlayerModule,
@@ -62,7 +62,7 @@ import { VgBufferingModule} from '@videogular/ngx-videogular/buffering'
     AppRoutingModule,
     MatListModule,YouTubePlayerModule,
     MatDialogModule,MatFormFieldModule,MatButtonModule,MatInputModule,ReactiveFormsModule,FormsModule,MatGridListModule,
-    VgCoreModule,VgControlsModule,VgOverlayPlayModule,VgBufferingModule
+    VgCoreModule,VgControlsModule,VgOverlayPlayModule,VgBufferingModule,MatTableModule
   ],
   providers: [],
   bootstrap: [AppComponent]

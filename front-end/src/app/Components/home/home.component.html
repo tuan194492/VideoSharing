@@ -8,9 +8,15 @@ live="false"
 ></app-video-card> -->
 <mat-grid-list cols="4">
     <mat-grid-tile *ngFor="let v of videolist; let i = index" >
-        <app-video-card routerLinkActive="active current" [routerLink]="['/watchVideo',v.id]" title={{v.title}} timestamp=" 2 days ago" channel={{v.user_name}} views={{v.view}} image="/assets/wnm.jpg"
+        <app-video-card routerLinkActive="active current" [routerLink]="['/watchVideo',v.id]" 
+        title={{v.title}} 
+        timestamp=" 2 days ago" 
+        channel={{v.user_name}} 
+        views={{v.view}} 
+        image="http://localhost:3000/api/video/stream/{{v.id}}"
         live="false">
         </app-video-card>
     </mat-grid-tile>
  
 </mat-grid-list>
+<!-- image="http://localhost:3000/api/video/stream/{{v.id}}" -->
