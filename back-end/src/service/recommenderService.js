@@ -35,7 +35,7 @@ const getPopularVideo = async (numberOfVideo) => {
 };
 
 const getRecommendVideoByUser = async (userId) => {
-	const similarUsers = await getSimilarUsers(parseInt(userId), 1);
+	const similarUsers = await getSimilarUsers(parseInt(userId), 2);
 	console.debug("🚀🚀🚀 ~ file: recommenderService.js:38 ~ getRecommendVideoByUser ~ Similar UserID:", userId)
 	console.debug("🚀🚀🚀 ~ file: recommenderService.js:39 ~ getRecommendVideoByUser ~ similarUsers:", similarUsers)
 	const recommendVideos = [];
@@ -109,7 +109,7 @@ const getUtilityMatrix = async () => {
 					console.log("=============================");
 					console.log(points[i][k], points[j][k]);
 					console.log("=============================");
-					if (points[i][k] && points[j][k]) {
+					if ((points[i][k] && points[j][k]) || (i == j)) {
 						similarities.push(Math.abs(points[i][k] - points[j][k]));
 					} else {
 						similarities.push(RANDOM_LARGE_NUMBER);
@@ -142,7 +142,8 @@ const getSimilarUsers = async (userId, numberOfUser) => {
 		const similarVector = similarities[currentUserIndex];
 		console.debug("🚀🚀🚀 ~ file: recommenderService.js:136 ~ getSimilarUsers ~ similarVector:", similarVector)
 		const sortedArr = similarVector.slice(0);
-		sortedArr.sort();
+		sortedArr.sort((a,b) => a - b);
+		console.log("🚀 ~ file: recommenderService.js:146 ~ getSimilarUsers ~ sortedArr:", sortedArr)
 		console.debug("🚀🚀🚀 ~ file: recommenderService.js:130 ~ getSimilarUsers ~ numberOfUser:", numberOfUser)
 		console.debug("🚀🚀🚀 ~ file: recommenderService.js:149 ~ returnsortedArr.slice ~ sortedArr.slice(1, 1 + parseInt(numberOfUser)):", sortedArr.slice(1, 1 + parseInt(numberOfUser)))
 		return sortedArr.slice(1, 1 + parseInt(numberOfUser)).map((n) => {
