@@ -2,6 +2,7 @@ const express = require("express");
 
 const videoService = require("../service/videoService");
 const commentService = require("../service/commentService");
+const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
 const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
 const loggingService = require("../service/loggingService");
@@ -17,10 +18,22 @@ const getCommentsByVideo = async (req, res, next) => {
 			page,
 			pageSize
 		);
+		console.log("🚀 ~ file: commentController.js:20 ~ getCommentsByVideo ~ getCommentsResult:", getCommentsResult)
+		const comments = [];
+		for (let comment of getCommentsResult.data.rows) {
+			const user = await userService.getUserById(comment.user_id);
+			comments.push({
+				...comment.dataValues, 
+				username: user.name || "No name"
+			})
+		}
 		if (getCommentsResult.success) {
 			return res.status(200).json({
 				success: true,
-				data: getCommentsResult.data,
+				data: {
+					rows: comments.length,
+					data: comments
+				},
 				message: "Get Comment list successful",
 			});
 		} else {
