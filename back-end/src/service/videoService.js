@@ -40,6 +40,9 @@ const getViewerVideoList = async (data) => {
 		const page = parseInt(data.page) || 1;
 		const pageSize = parseInt(data.pageSize) || 10;
 		const result = await Video.findAndCountAll({
+			where: {
+				status: VIDEO_STATUS.PUBLIC
+			},
 			limit: pageSize,
 			offset: page - 1,
 		});
@@ -270,6 +273,7 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
 			},
 			page: page - 1,
 			limit: pageSize,
+			order: [['views', 'DESC']]
 		});
 
 		console.log("Search results:", results);
