@@ -32,7 +32,7 @@ const videoMiddleware = require('../middlleware/videoMiddleware');
 router.get('/watch', videoController.getViewerVideoList);
 router.get('/get-by-publisher/:publisherId', authMiddleware.getUserToken, videoController.getVideoByPublisherId);
 router.get('/similarUser/:userId', videoController.getSimilarUsers);
-router.get('/search', videoController.searchVideos); 
+router.post('/search', videoController.searchVideos); 
 router.get('/stream/:id', videoController.streamVideoById);
 router.get('/data/:id', videoController.getVideoDataById);
 router.get('/:id', videoController.getVideoById);
