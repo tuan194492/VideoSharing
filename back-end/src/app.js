@@ -6,11 +6,13 @@ const route = require('./routes/index');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const bodyParser = require('body-parser');
+const recommenderService = require("../src/service/recommenderService");
 
 const {databaseInit} = require("../src/utils/database/index")
 const connectMongoDB = require("../src/utils/database/mongo");
 const app = express();
 const port = 3000;
+const UPDATE_RECOMMEND_MINUTE = 30;
 
 app.use(cors()) // Use this after the variable declaration
 
@@ -73,6 +75,11 @@ databaseInit();
 route(app);
 
 connectMongoDB();
+
+setInterval(() => {
+  console.info("Reseting utility matrix");
+  recommenderService.resetMatrix();
+}, 1000 * 60);
 
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);

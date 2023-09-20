@@ -23,6 +23,17 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+const getUserToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  jwt.verify(token, jwtSecret, (err, user) => {
+    req.user = user;
+    console.log("USER from token", req.user);
+    next();
+  });
+}
+
 module.exports = {
-    authenticateToken
+    authenticateToken,
+    getUserToken
 }
