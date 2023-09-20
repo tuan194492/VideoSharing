@@ -245,6 +245,7 @@ const getVideoByPublisherId = async (req, res, next) => {
 
 const searchVideos = async (req, res, next) => {
 	let { keyword, page, pageSize } = req.body;
+	console.debug("🚀🚀🚀 ~ file: videoController.js:248 ~ searchVideos ~ req.body:", req.body)
 	console.log("Searching video");
 	console.log(keyword);
 	const result = await videoService.fullTextSearchVideo(
