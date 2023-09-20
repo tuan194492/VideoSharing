@@ -76,6 +76,11 @@ route(app);
 
 connectMongoDB();
 
+setInterval(() => {
+  console.info("Reseting utility matrix");
+  recommenderService.resetMatrix();
+}, 1000 * 60);
+
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
 });

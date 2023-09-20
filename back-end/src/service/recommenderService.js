@@ -7,6 +7,7 @@ const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
 const videoService = require("./videoService");
 
+const RANDOM_LARGE_NUMBER = 100;
 let utilityMatrix, pointMatrix;
 let users = [];
 let videos = [];
@@ -108,7 +109,11 @@ const getUtilityMatrix = async () => {
 					console.log("=============================");
 					console.log(points[i][k], points[j][k]);
 					console.log("=============================");
-					similarities.push(Math.abs(points[i][k] - points[j][k]));
+					if (points[i][k] && points[j][k]) {
+						similarities.push(Math.abs(points[i][k] - points[j][k]));
+					} else {
+						similarities.push(RANDOM_LARGE_NUMBER);
+					}
 				}
 				if (similarities.length > 0) {
 					const similarity =
@@ -171,7 +176,7 @@ const getMostInterestedVideoByUser = async (userId, numberOfVideo) => {
 
 const resetMatrix = () => {
 	console.debug("🚀🚀🚀 ~ file: recommenderService.js:161 ~ resetMatrix ~ Utility matrix Resetted")
-	utilityMatrix = [];
+	utilityMatrix = null;
 	pointMatrix = [];
 	users = [];
 	videos = [];
