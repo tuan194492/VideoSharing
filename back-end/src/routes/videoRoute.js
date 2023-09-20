@@ -30,12 +30,12 @@ const videoMiddleware = require('../middlleware/videoMiddleware');
  * */
 
 router.get('/watch', videoController.getViewerVideoList);
-router.get('/get-by-publisher/:publisherId', videoController.getVideoByPublisherId);
+router.get('/get-by-publisher/:publisherId', authMiddleware.getUserToken, videoController.getVideoByPublisherId);
 router.get('/similarUser/:userId', videoController.getSimilarUsers);
 router.get('/search', videoController.searchVideos); 
 router.get('/stream/:id', videoController.streamVideoById);
 router.get('/data/:id', videoController.getVideoDataById);
-router.get('/:id', authMiddleware.authenticateToken ,videoController.getVideoById);
+router.get('/:id', videoController.getVideoById);
 router.post('/', authMiddleware.authenticateToken, videoMiddleware.validateUpload, videoController.createVideo);
 router.put('/:id', authMiddleware.authenticateToken ,videoController.updateVideo);
 router.delete('/:id', authMiddleware.authenticateToken ,videoController.deleteVideo);

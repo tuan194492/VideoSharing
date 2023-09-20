@@ -64,18 +64,35 @@ const getVideoByPublisherId = async (data) => {
 		console.log(data);
 		const page = parseInt(data.page) || 1;
 		const pageSize = parseInt(data.pageSize) || 10;
-		const result = await Video.findAndCountAll({
-			where: {
-				publisher_id: data,
-			},
-			limit: pageSize,
-			offset: page - 1,
-		});
-		return {
-			success: true,
-			message: "Get video list successfull",
-			data: result,
-		};
+		if (data.userId == data.publisherId) {
+			const result = await Video.findAndCountAll({
+				where: {
+					publisher_id: data.publisherId,
+				},
+				limit: pageSize,
+				offset: page - 1,
+			});
+			return {
+				success: true,
+				message: "Get video list successfull",
+				data: result,
+			};
+		} else {
+			const result = await Video.findAndCountAll({
+				where: {
+					publisher_id: data.publisherId,
+					status: VIDEO_STATUS.PUBLIC
+				},
+				limit: pageSize,
+				offset: page - 1,
+			});
+			return {
+				success: true,
+				message: "Get video list successfull",
+				data: result,
+			};
+		}
+		
 	} catch (e) {
 		return {
 			success: false,
@@ -190,7 +207,14 @@ const findVideoById = async (id, guestId) => {
 	try {
 		console.log(guestId);
 		const video = await Video.findByPk(id);
+		
 		if (video) {
+			if (video.status == VIDEO_STATUS.PRIVATE && guestId != video.publisher_id) {
+				return {
+					success: false,
+					message: "You can't access this video"
+				}
+			}
 			const like = await Reaction.count({
 				where: {
 					video_id: id,

@@ -7,7 +7,7 @@ const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
 const loggingService = require("../service/loggingService");
 const recommenderService = require("../service/recommenderService");
-const { NOTIFY_ACTION, USER_ACTION } = require("../constant/enum/ENUM");
+const { NOTIFY_ACTION, USER_ACTION, VIDEO_STATUS } = require("../constant/enum/ENUM");
 const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
 const getVideoDataById = async (req, res, next) => {};
@@ -208,18 +208,27 @@ const getViewerVideoList = async (req, res, next) => {
 };
 
 const getVideoByPublisherId = async (req, res, next) => {
-	const result = await videoService.getVideoByPublisherId(req.params.publisherId);
-
+	const userId = req?.user?.userId;
+	const result = await videoService.getVideoByPublisherId({
+		...req.params,
+		...req.body,
+		userId: userId
+	});
 	if (result.success) {
 		let videos = [];
 		for (let video of result.data.rows) {
 			const user = await userService.getUserById(
 				video.dataValues.publisher_id
 			);
-			videos.push({
-				...video.dataValues,
-				user_name: user?.name || "No name",
-			});
+			if (video.dataValues.publisher_id != userId && video.dataValues.status != VIDEO_STATUS.PUBLIC) {
+				continue;
+			} else {
+				videos.push({
+					...video.dataValues,
+					user_name: user?.name || "No name",
+				});
+			}
+			
 		}
 		return res.status(200).json({
 			success: true,
