@@ -291,7 +291,7 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
 			where: {
 				[Sequelize.Op.or]: [
 					Sequelize.literal(
-						`MATCH(title, description) AGAINST('${searchQuery}%' IN BOOLEAN MODE)`
+						`MATCH(title, description) AGAINST('+${searchQuery}*' IN BOOLEAN MODE)`
 					),
 				],
 			},
