@@ -267,9 +267,15 @@ const searchVideos = async (req, res, next) => {
 };
 
 const getSimilarUsers = async (req, res, next) => {
-	const videos = await recommenderService.getRecommendVideoListByUser(req.params.userId);
+	const videoIds = await recommenderService.getRecommendVideoListByUser(req.params.userId);
+	const videos = [];
+	for (let videoId of videoIds) {
+		const video = await videoService.findVideoById(videoId, req.params.userId);
+		videos.push(video);
+	}
 	return res.status(200).json({
 		data: 'hihi',
+		count: videos.length,
 		videos: videos
 	});
 }
