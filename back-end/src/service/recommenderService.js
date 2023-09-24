@@ -7,7 +7,7 @@ const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
 const videoService = require("./videoService");
 
-const RANDOM_LARGE_NUMBER = 100;
+const RANDOM_LARGE_NUMBER = 5;
 let utilityMatrix, pointMatrix;
 let users = [];
 let videos = [];
@@ -111,8 +111,10 @@ const getUtilityMatrix = async () => {
 					console.log("=============================");
 					if ((points[i][k] && points[j][k]) || (i == j)) {
 						similarities.push(Math.abs(points[i][k] - points[j][k]));
+					} else if (points[i][k] || points[j][k] ) {
+						similarities.push(Math.abs(points[i][k] - points[j][k]) * RANDOM_LARGE_NUMBER);
 					} else {
-						similarities.push(RANDOM_LARGE_NUMBER);
+						similarities.push(0);
 					}
 				}
 				if (similarities.length > 0) {
