@@ -32,6 +32,7 @@ const login = async (req, res, next) => {
             token: token,
             user: user,
             message: "Login successful",
+            role: 'user'
         });
 
     })

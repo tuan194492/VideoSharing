@@ -8,7 +8,6 @@ const VIDEO_STATUS = {
 
 const USER_ACTION = {
     WATCH: 'WATCH',
-    SEARCH: 'SEARCH',
     LIKE: 'LIKE',
     DISLIKE: 'DISLIKE',
     COMMENT: 'COMMENT'

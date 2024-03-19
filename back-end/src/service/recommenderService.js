@@ -19,7 +19,6 @@ const getRecommendVideoListByUser = async (userId) => {
 			getPopularVideo(5),
 			getRecommendVideoByUser(userId),
 		]);
-		console.log("VIDEOOOOOOOOOOOO", values);
 		const popularVideos = values[0];
 		const recommendVideos = values[1];
 		return combinePopularWithRecommendVideo(popularVideos, recommendVideos);
