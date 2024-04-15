@@ -82,10 +82,12 @@ const getVideoById = async (req, res, next) => {
       data: {
         ...result.data,
         user_name: user?.name || "No name",
+		subcriberCount: user?.subcriberCount,
+		postedSince: ((new Date()).getTime() - result.data.createdAt) / 1000
       }
     });
   } else {
-    return res.status(400).json({
+    return res.status(400).json({ 
       success: false,
       message: result.message,
     });
