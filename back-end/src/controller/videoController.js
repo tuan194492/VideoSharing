@@ -181,10 +181,13 @@ const streamVideoById = async (req, res, next) => {
 };
 
 const getViewerVideoList = async (req, res, next) => {
-	const result = await videoService.getViewerVideoList(req.body);
+	console.log(req.body)
+	console.log(req.query)
+	const result = await videoService.getViewerVideoList(req.query);
 
 	if (result.success) {
 		let videos = [];
+		const currentDate = new Date();
 		for (let video of result.data.rows) {
 			const user = await userService.getUserById(
 				video.dataValues.publisher_id
@@ -192,6 +195,7 @@ const getViewerVideoList = async (req, res, next) => {
 			videos.push({
 				...video.dataValues,
 				user_name: user?.name || "No name",
+				postedSince: (currentDate.getTime() - video.createdAt) / 1000
 			});
 		}
 		return res.status(200).json({

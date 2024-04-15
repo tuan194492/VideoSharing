@@ -162,7 +162,7 @@ const createVideoMetaData = async (meta, url, user) => {
 		description: meta.description || "",
 		url: url,
 		publisher_id: user.userId,
-		status: VIDEO_STATUS.PUBLIC,
+		status: meta.isPublic ? VIDEO_STATUS.PUBLIC : VIDEO_STATUS.PRIVATE,
 		thumbnail: meta?.thumbnail.data,
 		views: 0,
 	};

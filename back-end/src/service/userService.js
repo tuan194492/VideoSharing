@@ -13,7 +13,7 @@ const validateNewUser = async (newUser) => {
   if (user) {
     return {
       success: false,
-      message: "User already existed!",
+      message: "Email already existed! Please choose another one!",
     };
   } else {
     return {
