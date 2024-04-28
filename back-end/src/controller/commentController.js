@@ -11,8 +11,8 @@ const getCommentsByVideo = async (req, res, next) => {
 	const id = req.params.videoId;
 	const result = await videoService.findVideoById(id);
 	if (result.success) {
-		const page = parseInt(req.body.page) || 1;
-		const pageSize = parseInt(req.body.pageSize) || 10;
+		const page = parseInt(req.query.page) || 1;
+		const pageSize = parseInt(req.query.pageSize) || 10;
 		const getCommentsResult = await commentService.getCommentByVideo(
 			id,
 			page,
@@ -21,10 +21,12 @@ const getCommentsByVideo = async (req, res, next) => {
 		console.log("🚀 ~ file: commentController.js:20 ~ getCommentsByVideo ~ getCommentsResult:", getCommentsResult)
 		const comments = [];
 		for (let comment of getCommentsResult.data.rows) {
-			const user = await userService.getUserById(comment.user_id);
-			comments.push({
-				...comment.dataValues, 
-				username: user.name || "No name"
+			const data = await userService.getUserById(comment.user_id);
+      const user = data.success ? data.user : null;
+
+      comments.push({
+				...comment.dataValues,
+				username: user?.name || "No name"
 			})
 		}
 		if (getCommentsResult.success) {

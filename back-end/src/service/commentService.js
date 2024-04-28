@@ -14,7 +14,7 @@ const addComment = async (comment, sender, videoId) => {
       message: "Post comment successful",
     };
   } catch (e) {
-    return { 
+    return {
       success: false,
       message: e,
     };
@@ -37,7 +37,7 @@ const getCommentByVideo = async (videoId, page, pageSize) => {
         video_id: videoId,
       },
       limit: pageSize,
-      offset: page - 1,
+      offset: (page - 1) * pageSize,
     });
     return {
       success: true,
@@ -48,7 +48,7 @@ const getCommentByVideo = async (videoId, page, pageSize) => {
     return {
       success: false,
       message: e,
-    }; 
+    };
   }
 };
 

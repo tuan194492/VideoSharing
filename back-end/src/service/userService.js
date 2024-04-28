@@ -42,10 +42,19 @@ const createNewUser = async (user) => {
 
 const getUserById = async (id) => {
   try {
-    return await User.findByPk(id);
+    const user = await User.findByPk(id);
+
+    return {
+      success: true,
+      message: 'Success',
+      user: user
+    }
   } catch (err) {
     console.log(err);
-    return null;
+    return {
+      success: false,
+      message: err.message
+    };
   }
 }
 

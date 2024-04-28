@@ -44,7 +44,7 @@ const getViewerVideoList = async (data) => {
 				status: VIDEO_STATUS.PUBLIC
 			},
 			limit: pageSize,
-			offset: page - 1,
+			offset: (page - 1) * pageSize,
 		});
 		return {
 			success: true,
@@ -92,7 +92,7 @@ const getVideoByPublisherId = async (data) => {
 				data: result,
 			};
 		}
-		
+
 	} catch (e) {
 		return {
 			success: false,
@@ -207,7 +207,7 @@ const findVideoById = async (id, guestId) => {
 	try {
 		console.log(guestId);
 		const video = await Video.findByPk(id);
-		
+
 		if (video) {
 			if (video.status == VIDEO_STATUS.PRIVATE && guestId != video.publisher_id) {
 				return {
@@ -330,7 +330,7 @@ const getMostWatchedVideos = async (videoNumbers) => {
 			order: [
 				['views', 'DESC']
 			],
-			limit: parseInt(videoNumbers) 
+			limit: parseInt(videoNumbers)
 		})
 
 		return videos.map(video => video.id);

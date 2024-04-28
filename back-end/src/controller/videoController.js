@@ -76,7 +76,8 @@ const getVideoById = async (req, res, next) => {
   const id = req.params.id;
   const result = await videoService.findVideoById(id, req?.user?.userId);
   if (result.success) {
-    const user = await userService.getUserById(result.data.publisher_id);
+    const data = await userService.getUserById(result.data.publisher_id);
+    const user = data.success ? data.user : null;
     return res.status(200).json({
       success: true,
       data: {
@@ -87,7 +88,7 @@ const getVideoById = async (req, res, next) => {
       }
     });
   } else {
-    return res.status(400).json({ 
+    return res.status(400).json({
       success: false,
       message: result.message,
     });
@@ -191,9 +192,10 @@ const getViewerVideoList = async (req, res, next) => {
 		let videos = [];
 		const currentDate = new Date();
 		for (let video of result.data.rows) {
-			const user = await userService.getUserById(
+			const data = await userService.getUserById(
 				video.dataValues.publisher_id
 			);
+      const user = data.success ? data.user : null;
 			videos.push({
 				...video.dataValues,
 				user_name: user?.name || "No name",
@@ -223,9 +225,10 @@ const getVideoByPublisherId = async (req, res, next) => {
 	if (result.success) {
 		let videos = [];
 		for (let video of result.data.rows) {
-			const user = await userService.getUserById(
+			const data = await userService.getUserById(
 				video.dataValues.publisher_id
 			);
+      const user = data.success ? data.user : null;
 			if (video.dataValues.publisher_id != userId && video.dataValues.status != VIDEO_STATUS.PUBLIC) {
 				continue;
 			} else {
@@ -234,7 +237,7 @@ const getVideoByPublisherId = async (req, res, next) => {
 					user_name: user?.name || "No name",
 				});
 			}
-			
+
 		}
 		return res.status(200).json({
 			success: true,
