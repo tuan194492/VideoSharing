@@ -5,11 +5,13 @@ const userService = require("../service/userService");
 
 const subcribeToUser = async (userId, channelId) => {
   try {
+    console.log(userId);
+    console.log(channelId)
     if (userId == channelId) {
         return {
             success: false,
-            message: "Can't subcribe to own channel"
-          } 
+            message: "Can't subscribe to own channel"
+          }
     }
     const user = await User.findByPk(userId);
     const channel = await User.findByPk(channelId);
@@ -20,12 +22,12 @@ const subcribeToUser = async (userId, channelId) => {
       });
       return {
         success: true,
-        message: "Subcribe to channel successful"
+        message: "Subscribe to channel successful"
       }
     } else {
       return {
         success: false,
-        message: "Subcribe to channel unsuccessful",
+        message: "Subscribe to channel unsuccessful",
       };
     }
   } catch (e) {
@@ -49,12 +51,12 @@ const unsubcribeToUser = async (userId, channelId) => {
       });
       return {
         success: true,
-        message: "Unsubcribe to channel successful"
+        message: "Unsubscribe to channel successful"
       }
     } else {
       return {
         success: false,
-        message: "Unsubcribe to channel unsuccessful",
+        message: "Unsubscribe to channel unsuccessful",
       };
     }
   } catch (e) {
@@ -123,9 +125,40 @@ const getListOfSubcribedChannel = async (userId) => {
       }
 };
 
+const isSubscribedToChannel = async (userId, channelId) => {
+  try {
+    const channel = await User.findByPk(userId);
+    if (channel) {
+      const data = await Subcriber.findAll({
+        where: {
+          subscriber_id: userId,
+          publisher_id: channelId
+        },
+      });
+      return {
+        success: true,
+        isSubscribed: data.length > 0
+      }
+    } else {
+      return {
+        success: false,
+        isSubscribed: false,
+        message: "User not found",
+      };
+    }
+  } catch (e) {
+    return {
+      success: false,
+      isSubscribed: false,
+      message: "User not found",
+    };
+  }
+};
+
 module.exports = {
   subcribeToUser,
   getListOfSubcribersByChannelId,
   getListOfSubcribedChannel,
   unsubcribeToUser,
+  isSubscribedToChannel
 };

@@ -26,8 +26,9 @@ const getCommentsByVideo = async (req, res, next) => {
 
       comments.push({
 				...comment.dataValues,
-				username: user?.name || "No name"
-			})
+				username: user?.name || "No name",
+        postedSince: ((new Date()).getTime() - comment.createdAt) / 1000
+      })
 		}
 		if (getCommentsResult.success) {
 			return res.status(200).json({

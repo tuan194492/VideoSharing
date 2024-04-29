@@ -16,13 +16,13 @@ const subcribeToChannel = async (req, res, next) => {
         notifyService.createNotifications(params, NOTIFY_ACTION.SUBCRIBE);
         return res.status(200).json({
             success: true,
-            message: "Subcribe successful"
+            message: "Subscribe successful"
         });
     } else {
         return res.status(400).json({
             success: false,
             message: subcribeResult.message
-        }) 
+        })
     }
 }
 
@@ -32,13 +32,13 @@ const unsubcribeToChannel = async (req, res, next) => {
     if (subcribeResult.success) {
         return res.status(200).json({
             success: true,
-            message: "Unsubcribe successful"
+            message: "Unsubscribe successful"
         });
     } else {
         return res.status(400).json({
             success: false,
             message: subcribeResult.message
-        }) 
+        })
     }
 }
 
@@ -57,7 +57,7 @@ const getChannelSubcribers = async (req, res, next) => {
             success: false,
             message: subcribeResult.message,
             data: subcribeResult.data
-        }) 
+        })
     }
 }
 
@@ -75,13 +75,32 @@ const getChannelSubcribeTo = async (req, res, next) => {
             success: false,
             message: subcribeResult.message,
             data: subcribeResult.data
-        }) 
+        })
     }
 }
 
+const isSubscribedToChannel = async (req, res, next) => {
+  const userId = req.user.userId;
+  const channelId = req.params.channelId;
+  const subscribeResult = await subcriberService.isSubscribedToChannel(userId, channelId);
+  if (subscribeResult.success) {
+    return res.status(200).json({
+      success: true,
+      message: "Get list of subcribe channel successful",
+      isSubscribed: subscribeResult.isSubscribed
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: subscribeResult.message,
+      isSubscribed: false
+    })
+  }
+}
 module.exports = {
     subcribeToChannel,
     unsubcribeToChannel,
     getChannelSubcribers,
-    getChannelSubcribeTo
+    getChannelSubcribeTo,
+    isSubscribedToChannel
 }
