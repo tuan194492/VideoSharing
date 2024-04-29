@@ -35,7 +35,7 @@ app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
 }));
 
-io.listen("2999");
+io.listen(2999);
 
 // Above our `app.get("/users")` handler
 io.on("connection", (socket) => {
@@ -106,3 +106,6 @@ setInterval(() => {
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
 });
+
+module.exports.io = io;
+
