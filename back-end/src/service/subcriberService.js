@@ -20,6 +20,8 @@ const subcribeToUser = async (userId, channelId) => {
         publisher_id: channelId,
         subscriber_id: userId,
       });
+      channel.subscriberCount++;
+      await channel.save();
       return {
         success: true,
         message: "Subscribe to channel successful"
@@ -49,6 +51,8 @@ const unsubcribeToUser = async (userId, channelId) => {
           subscriber_id: userId,
         },
       });
+      channel.subscriberCount--;
+      await channel.save();
       return {
         success: true,
         message: "Unsubscribe to channel successful"

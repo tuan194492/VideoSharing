@@ -63,7 +63,28 @@ const dislikeVideo = async (req, res, next) => {
   }
 };
 
+const getReactStatusToVideo = async (req, res, next) => {
+  const userId = req.user.userId;
+  const videoId = req.params.videoId;
+  const result = await reactionService.getUserReactionToVideo(userId, videoId);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      isLiked: res.isLiked,
+      isDisliked: res.isDisliked
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      isLiked: false,
+      isDisliked: false,
+      message: result.message,
+    });
+  }
+}
+
 module.exports = {
   likeVideo,
   dislikeVideo,
+  getReactStatusToVideo
 };

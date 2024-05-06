@@ -7,6 +7,7 @@ const Video = sequelize.define('Video', {
     title: DataTypes.TEXT,
     description: DataTypes.TEXT,
     keywords: DataTypes.STRING,
+    commentCount: DataTypes.INTEGER,
     status: DataTypes.CHAR,
     views: DataTypes.INTEGER,
     thumbnail: DataTypes.BLOB('long'),

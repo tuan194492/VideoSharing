@@ -94,9 +94,53 @@ const dislikeVideo = async (userId, videoId) => {
     }
 }
 
+const getUserReactionToVideo = async (userId, videoId) => {
+    try {
+        const user = await User.findByPk(userId);
+        const video = await Video.findByPk(videoId);
+        if (!user || !video) {
+            return {
+                success: false,
+                message: "User or video not found"
+            }
+        }
+        const reaction = await Reaction.findOne({
+            where: {
+                user_id: userId,
+                video_id: videoId
+            }
+        })
+
+        if (reaction == null) {
+            return {
+                success: true,
+                isLiked: false,
+                isDisliked: false,
+                message: 'Get data successful'
+            }
+        }
+
+        return {
+            success: true,
+            isLiked: reaction.type === REACTION_TYPE.LIKE,
+            isDisliked: reaction.type === REACTION_TYPE.DISLIKE,
+            message: 'Get data successful'
+        }
+
+    } catch (err) {
+        return {
+            success: false,
+            isLiked: false,
+            message: err
+        }
+    }
+}
+
+
 module.exports = {
     getLikeCountOfVideo,
     getDislikeCountOfVideo,
     likeVideo,
-    dislikeVideo
+    dislikeVideo,
+    getUserReactionToVideo
 }

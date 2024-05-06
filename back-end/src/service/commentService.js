@@ -9,6 +9,14 @@ const addComment = async (comment, sender, videoId) => {
       video_id: videoId,
       value: comment,
     });
+
+    const video = await Video.findByPk(videoId);
+    if (video) {
+      video.commentCount++;
+      await video.save();
+    }
+
+
     return {
       success: true,
       message: "Post comment successful",
@@ -54,11 +62,31 @@ const getCommentByVideo = async (videoId, page, pageSize) => {
 
 const deleteComment = async (commentId) => {
   try {
+    const comment = await Comment.findByPk(commentId, {
+      include: [
+        {
+          model: Video,
+          as: 'video'
+        }
+      ]
+    });
+    if (comment == null) {
+      return {
+        success: true,
+        message: "Delete comment successful",
+      };
+    }
+    const video = comment.video;
+    if (video) {
+      video.commentCount++;
+      await video.save();
+    }
     await Comment.destroy({
       where: {
         id: commentId,
       },
     });
+
     return {
       success: true,
       message: "Delete comment successful",
@@ -70,6 +98,7 @@ const deleteComment = async (commentId) => {
     };
   }
 };
+
 
 module.exports = {
   addComment,

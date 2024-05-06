@@ -80,7 +80,13 @@ const getChannelSubcribeTo = async (req, res, next) => {
 }
 
 const isSubscribedToChannel = async (req, res, next) => {
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
+  if (userId == null) {
+      return res.status(400).json({
+          success: false,
+          isSubscribed: false
+      })
+  }
   const channelId = req.params.channelId;
   const subscribeResult = await subcriberService.isSubscribedToChannel(userId, channelId);
   if (subscribeResult.success) {
