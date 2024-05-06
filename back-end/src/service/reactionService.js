@@ -63,7 +63,7 @@ const dislikeVideo = async (userId, videoId) => {
                 message: "User or video not found"
             }
         }
-        
+
         const reaction = await Reaction.findOne({
             where: {
                 user_id: userId,
@@ -92,6 +92,80 @@ const dislikeVideo = async (userId, videoId) => {
             message: err
         }
     }
+}
+
+const undoLikeVideo = async (userId, videoId) => {
+  try {
+    const user = await User.findByPk(userId);
+    const video = await Video.findByPk(videoId);
+    if (!user || !video) {
+      return {
+        success: false,
+        message: "User or video not found"
+      }
+    }
+    const reaction = await Reaction.findOne({
+      where: {
+        user_id: userId,
+        video_id: videoId,
+        type: REACTION_TYPE.LIKE
+      }
+    })
+    if (reaction) {
+      await reaction.destroy();
+      return {
+        success: true,
+        message: "Undo like successful"
+      }
+    } else {
+      return {
+        success: false,
+        message: "Must like to undo"
+      }
+    }
+  } catch (err) {
+    return {
+      success: false,
+      message: err
+    }
+  }
+}
+
+const undoDislikeVideo = async (userId, videoId) => {
+  try {
+    const user = await User.findByPk(userId);
+    const video = await Video.findByPk(videoId);
+    if (!user || !video) {
+      return {
+        success: false,
+        message: "User or video not found"
+      }
+    }
+    const reaction = await Reaction.findOne({
+      where: {
+        user_id: userId,
+        video_id: videoId,
+        type: REACTION_TYPE.DISLIKE
+      }
+    })
+    if (reaction) {
+      await reaction.destroy();
+      return {
+        success: true,
+        message: "Undo dislike successful"
+      }
+    } else {
+      return {
+        success: false,
+        message: "Must dislike to undo"
+      }
+    }
+  } catch (err) {
+    return {
+      success: false,
+      message: err
+    }
+  }
 }
 
 const getUserReactionToVideo = async (userId, videoId) => {
