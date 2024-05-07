@@ -30,6 +30,7 @@ const likeVideo = async (userId, videoId) => {
             }
         })
         if (reaction) {
+
             return {
                 success: false,
                 message: "Already Reacted"
@@ -40,6 +41,8 @@ const likeVideo = async (userId, videoId) => {
                 video_id: videoId,
                 type: REACTION_TYPE.LIKE
             })
+            video.likeCount++;
+            await video.save();
             return {
                 success: true,
                 message: "Liked video successful"
@@ -71,6 +74,7 @@ const dislikeVideo = async (userId, videoId) => {
             }
         })
         if (reaction) {
+
             return {
                 success: false,
                 message: "Already Reacted"
@@ -81,6 +85,8 @@ const dislikeVideo = async (userId, videoId) => {
                 video_id: videoId,
                 type: REACTION_TYPE.DISLIKE
             })
+            video.dislikeCount++;
+            await video.save();
             return {
                 success: true,
                 message: "Disliked video successful"
@@ -112,6 +118,8 @@ const undoLikeVideo = async (userId, videoId) => {
       }
     })
     if (reaction) {
+        video.likeCount--;
+        await video.save();
       await reaction.destroy();
       return {
         success: true,
@@ -149,6 +157,8 @@ const undoDislikeVideo = async (userId, videoId) => {
       }
     })
     if (reaction) {
+        video.dislikeCount--;
+        await video.save();
       await reaction.destroy();
       return {
         success: true,
@@ -216,5 +226,7 @@ module.exports = {
     getDislikeCountOfVideo,
     likeVideo,
     dislikeVideo,
-    getUserReactionToVideo
+    getUserReactionToVideo,
+    undoLikeVideo,
+    undoDislikeVideo
 }

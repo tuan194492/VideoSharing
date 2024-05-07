@@ -63,6 +63,62 @@ const dislikeVideo = async (req, res, next) => {
   }
 };
 
+const undoLikeVideo = async (req, res, next) => {
+  const userId = req.user.userId;
+  const videoId = req.params.videoId;
+  const result = await reactionService.undoLikeVideo(userId, videoId);
+  if (result.success) {
+    const params = {
+      actorId: req.user.userId,
+      videoId: videoId,
+      notifierId: 0,
+    };
+    // notifyService.createNotifications(params, NOTIFY_ACTION.REACT_LIKE);
+    loggingService.createLog({
+      userId: req.user.userId,
+      action: USER_ACTION.UNDO_LIKE,
+      videoId: videoId
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Undo like successful",
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
+
+const undoDislikeVideo = async (req, res, next) => {
+  const userId = req.user.userId;
+  const videoId = req.params.videoId;
+  const result = await reactionService.undoDislikeVideo(userId, videoId);
+  if (result.success) {
+    const params = {
+      actorId: req.user.userId,
+      videoId: videoId,
+      notifierId: 0,
+    };
+    // notifyService.createNotifications(params, NOTIFY_ACTION.REACT_DISLIKE);
+    loggingService.createLog({
+      userId: req.user.userId,
+      action: USER_ACTION.UNDO_DISLIKE,
+      videoId: videoId
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Undo dislike successful",
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
+
 const getReactStatusToVideo = async (req, res, next) => {
   const userId = req.user.userId;
   const videoId = req.params.videoId;
@@ -70,8 +126,8 @@ const getReactStatusToVideo = async (req, res, next) => {
   if (result.success) {
     return res.status(200).json({
       success: true,
-      isLiked: res.isLiked,
-      isDisliked: res.isDisliked
+      isLiked: result.isLiked,
+      isDisliked: result.isDisliked
     });
   } else {
     return res.status(400).json({
@@ -86,5 +142,7 @@ const getReactStatusToVideo = async (req, res, next) => {
 module.exports = {
   likeVideo,
   dislikeVideo,
-  getReactStatusToVideo
+  getReactStatusToVideo,
+  undoLikeVideo,
+  undoDislikeVideo
 };
