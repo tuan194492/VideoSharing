@@ -6,6 +6,7 @@ const subcriberRoute = require("./subcriberRoute");
 const notifyRoute = require("./notifyRoutes");
 const reactionRoute = require("./reactionRoute");
 const channelRoute = require("./channelRoute");
+const playlistRoute = require("./playlistRoute");
 
 const route = (app) => {
     app.use("/api/auth", authRoute);
@@ -15,7 +16,7 @@ const route = (app) => {
     app.use("/api/notifications", notifyRoute);
     app.use("/api/react", reactionRoute);
     app.use("/api/channel", channelRoute);
-
+    app.use("/api/playlist", playlistRoute);
 };
 
 module.exports = route;
