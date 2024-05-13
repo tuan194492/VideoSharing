@@ -122,7 +122,49 @@ const deleteVideoFromPlaylist = async (user, playlistId, videoId) => {
   }
 }
 
-const findPlaylistByChannelId = async (channelId) => {
+const findPlaylistByChannelId = async (channelId, isPublic) => {
+  try {
+    console.log('127',channelId, isPublic)
+    let playlist;
+    if (isPublic) {
+      playlist = await Playlist.findAndCountAll({
+        where: {
+          publisher_id: channelId,
+          status: VIDEO_STATUS.PUBLIC
+        }
+      })
+    } else {
+         playlist = await Playlist.findAndCountAll({
+          where: {
+            publisher_id: channelId,
+          }
+        })
+    }
+    console.log(playlist)
+    if (!playlist) {
+      return {
+        success: true,
+        message: 'Get playlist successful',
+        playlist: {
+          count: 0,
+          rows: []
+        }
+      }
+    }
+    return {
+      success: true,
+      message: 'Get playlist successful',
+      playlist: playlist
+    }
+  } catch (err) {
+    console.log('aa')
+    console.log(err);
+    return {
+      success: false,
+      message: err.message,
+      playlist: null
+    };
+  }
 
 }
 
@@ -176,11 +218,41 @@ const deletePlaylist = async (user, playlistId) => {
   }
 }
 
+const isAddedToPlaylist = async (videoId, playlistId) => {
+  try {
+    const playlist = await PlaylistVideo.findOne({
+      where: {
+        PlaylistId: playlistId,
+        VideoId: videoId
+      }
+    });
+    if (playlist) {
+      return {
+        success: true,
+        isAddedToPlaylist: true
+      }
+    } else {
+      return {
+        success: true,
+        isAddedToPlaylist: false
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    return {
+      success: false,
+      isAddedToPlaylist: true,
+      message: err.message
+    }
+  }
+}
+
 module.exports = {
     getPlaylistById,
     addVideoToPlaylist,
     deleteVideoFromPlaylist,
     findPlaylistByChannelId,
     createPlaylist,
-    deletePlaylist
+    deletePlaylist,
+    isAddedToPlaylist
 }

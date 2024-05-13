@@ -27,11 +27,39 @@ const getPlaylistDetail = async (req, res, next) => {
 }
 
 const getPublicPlaylistListOfChannel = async (req, res, next) => {
-
+  console.log(req.params.channelId)
+  const result = await playlistService.findPlaylistByChannelId(req.params.channelId, true);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: 'Get playlist successful',
+      data: result.playlist
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+      data: null
+    })
+  }
 }
 
 const getAllPlaylistListOfChannel = async (req, res, next) => {
-
+  console.log('aaa',req.user.userId);
+  const result = await playlistService.findPlaylistByChannelId(req.user.userId, false);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: 'Get playlist successful',
+      data: result.playlist
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+      data: null
+    })
+  }
 }
 
 const createPlaylist = async (req, res, next) => {
@@ -100,6 +128,22 @@ const removeVideoFromPlaylist = async (req, res, next) => {
   }
 }
 
+const isAddedToPlaylist = async (req, res, next) => {
+  const result = await playlistService.isAddedToPlaylist(req.body.videoId, req.body.playlistId);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      isAddedToPlaylist: result.isAddedToPlaylist
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+      isAddedToPlaylist: false
+    })
+  }
+}
+
 
 module.exports = {
   getPlaylistDetail,
@@ -108,5 +152,6 @@ module.exports = {
   addVideoToPlaylist,
   removeVideoFromPlaylist,
   createPlaylist,
-  deletePlaylist
+  deletePlaylist,
+  isAddedToPlaylist
 }
