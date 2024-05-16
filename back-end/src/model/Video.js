@@ -11,7 +11,8 @@ const Video = sequelize.define('Video', {
     status: DataTypes.CHAR,
     views: DataTypes.INTEGER,
     thumbnail: DataTypes.BLOB('long'),
-    created_at: DataTypes.DATE,   
+    created_at: DataTypes.DATE,
+    video_length_in_seconds: DataTypes.INTEGER
   }, {
       indexes: [
         {
@@ -19,7 +20,7 @@ const Video = sequelize.define('Video', {
           name: 'fulltext_index_name',
           fields: ['title', 'description'],
         },
-      ], 
+      ],
   });
 
 module.exports = Video;

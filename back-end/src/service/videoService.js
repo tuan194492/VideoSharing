@@ -10,6 +10,12 @@ const createVideo = async (meta, file, user) => {
 	const url = fileUtils.createUrlForVideo(file, user);
 	const shortenUrl = fileUtils.createShortenUrlForVideo(file, user);
 	const storeResult = await storeVideo(file, url);
+  const videoLength = file.duration;
+  console.log('Video length: ', videoLength)
+  meta = {
+    ...meta,
+    duration: videoLength
+  }
 	console.log(storeResult);
 	if (storeResult.success) {
 		const ress = await createVideoMetaData(meta, shortenUrl, user);
@@ -103,7 +109,6 @@ const getVideoByPublisherId = async (data) => {
 
 const updateVideo = async (videoData, id) => {
 	try {
-		Video.findB;
 		const video = await Video.findByPk(id);
 		if (video) {
 			console.log(video);
@@ -165,6 +170,7 @@ const createVideoMetaData = async (meta, url, user) => {
 		status: meta.isPublic ? VIDEO_STATUS.PUBLIC : VIDEO_STATUS.PRIVATE,
 		thumbnail: meta?.thumbnail.data,
 		views: 0,
+    video_length_in_seconds: meta?.duration
 	};
 	try {
 		const videoId = await Video.create(video);
