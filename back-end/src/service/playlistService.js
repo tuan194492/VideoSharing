@@ -2,6 +2,7 @@ const { VIDEO_STATUS, REACTION_TYPE } = require("../constant/enum/ENUM");
 
 const Playlist = require("../model/Playlist");
 const Video = require("../model/Video");
+const User = require("../model/User");
 const PlaylistVideo = require("../model/PlaylistVideo");
 
 async function authorizeUser(user, playlistId) {
@@ -36,7 +37,24 @@ const getPlaylistById = async (user, playlistId) => {
     return authorizeResult;
   }
   const playlist = await Playlist.findByPk(playlistId, {
-    include: Video,
+    include: [Video, User],
+  })
+  return {
+    success: true,
+    message: 'Get playlist successful',
+    playlist: playlist
+  }
+}
+
+const getPublicPlaylistInfoById = async (playlistId) => {
+  const playlist = await Playlist.findByPk(playlistId,
+    {
+      include: [{
+        model: Video,
+        where: {
+          status: VIDEO_STATUS.PUBLIC
+        }
+      }, User],
   })
   return {
     success: true,
@@ -131,13 +149,22 @@ const findPlaylistByChannelId = async (channelId, isPublic) => {
         where: {
           publisher_id: channelId,
           status: VIDEO_STATUS.PUBLIC
-        }
+        },
+        include: [
+          {
+            model: Video,
+            where: {
+              status: VIDEO_STATUS.PUBLIC
+            }
+          }
+        ]
       })
     } else {
          playlist = await Playlist.findAndCountAll({
           where: {
             publisher_id: channelId,
-          }
+          },
+           include: Video
         })
     }
     console.log(playlist)
@@ -254,5 +281,6 @@ module.exports = {
     findPlaylistByChannelId,
     createPlaylist,
     deletePlaylist,
-    isAddedToPlaylist
+    isAddedToPlaylist,
+    getPublicPlaylistInfoById
 }

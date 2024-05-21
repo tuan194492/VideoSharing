@@ -144,6 +144,23 @@ const isAddedToPlaylist = async (req, res, next) => {
   }
 }
 
+const getPublicPlaylistDetail = async (req, res, next) => {
+  const playlistId = req.params.playlistId;
+  const getPlaylistResult = await playlistService.getPublicPlaylistInfoById(playlistId);
+  if (getPlaylistResult.success) {
+    return res.status(200).json({
+      success: true,
+      message: 'Get playlist successful',
+      data: getPlaylistResult.playlist
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: getPlaylistResult.message,
+      data: []
+    })
+  }
+}
 
 module.exports = {
   getPlaylistDetail,
