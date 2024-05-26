@@ -170,7 +170,7 @@ const createVideoMetaData = async (meta, url, user) => {
 		status: meta.isPublic ? VIDEO_STATUS.PUBLIC : VIDEO_STATUS.PRIVATE,
 		thumbnail: meta?.thumbnail.data,
 		views: 0,
-    video_length_in_seconds: meta?.duration
+    video_length_in_seconds: meta?.duration || 0
 	};
 	try {
 		const videoId = await Video.create(video);

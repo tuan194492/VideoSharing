@@ -60,7 +60,18 @@ const register = async (req, res, next) => {
 }
 
 const update = async (req, res, next) => {
-    const updateResult = await userService.updateUser(req.body);
+    let data = {
+      ...req.body
+    }
+    console.log(req.files)
+    if (req.files) {
+      data = {
+        ...data,
+        avatar: req.files.avatar[0],
+        banner: req.files.banner[0]
+      }
+    }
+    const updateResult = await userService.updateUser(data);
     if (updateResult.success) {
       return res.status(200).json({
         success: true,

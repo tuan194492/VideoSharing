@@ -8,6 +8,7 @@ const User = sequelize.define('User', {
     password: DataTypes.STRING,
     status: DataTypes.CHAR,
     avatar: DataTypes.BLOB,
+    banner: DataTypes.BLOB,
     created_at: DataTypes.DATE,
     subscriberCount: DataTypes.NUMBER,
     facebook: DataTypes.STRING,

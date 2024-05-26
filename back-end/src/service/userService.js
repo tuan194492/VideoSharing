@@ -61,6 +61,7 @@ const getUserById = async (id) => {
 const updateUser = async (userData) => {
   try {
     const user = await User.findByPk(userData.id);
+    console.log(userData)
     if (user) {
       await user.update({
         ...userData
