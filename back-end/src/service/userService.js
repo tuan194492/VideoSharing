@@ -58,8 +58,37 @@ const getUserById = async (id) => {
   }
 }
 
+const updateUser = async (userData) => {
+  try {
+    const user = await User.findByPk(userData.id);
+    if (user) {
+      await user.update({
+        ...userData
+      });
+      return {
+        success: true,
+        message: 'Success',
+        user: user
+      }
+    } else {
+      return {
+        success: false,
+        message: 'User not found',
+        user: user
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    return {
+      success: false,
+      message: err.message
+    };
+  }
+}
+
 module.exports = {
   validateNewUser,
   createNewUser,
-  getUserById
+  getUserById,
+  updateUser
 };

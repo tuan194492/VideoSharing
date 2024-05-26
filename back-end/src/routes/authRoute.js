@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controller/authController')
+const authMiddleware = require("../middlleware/authMiddleware");
 
 /**
  * @swagger
@@ -24,11 +25,11 @@ const authController = require('../controller/authController')
  *                              description: The user's password.
  *                              example: 123456
  *     responses:
- *          201: 
+ *          201:
  *              description: Success
  *          500:
  *              description: Internal Server error
- *           
+ *
  * /api/auth/register:
  *   post:
  *     summary: Register
@@ -57,13 +58,13 @@ const authController = require('../controller/authController')
  *                              description: The user's password.
  *                              example: 123456
  *     responses:
- *          201: 
+ *          201:
  *              description: Success
  *          500:
  *              description: Internal Server error
 */
 router.post('/login', authController.login);
-
 router.post('/register', authController.register);
+router.post('/update', authMiddleware.authenticateToken  , authController.update);
 
 module.exports = router;

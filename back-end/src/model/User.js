@@ -9,7 +9,9 @@ const User = sequelize.define('User', {
     status: DataTypes.CHAR,
     avatar: DataTypes.BLOB,
     created_at: DataTypes.DATE,
-    subscriberCount: DataTypes.NUMBER
+    subscriberCount: DataTypes.NUMBER,
+    facebook: DataTypes.STRING,
+    description: DataTypes.STRING
   });
 
 module.exports = User

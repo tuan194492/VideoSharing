@@ -59,7 +59,23 @@ const register = async (req, res, next) => {
     }
 }
 
+const update = async (req, res, next) => {
+    const updateResult = await userService.updateUser(req.body);
+    if (updateResult.success) {
+      return res.status(200).json({
+        success: true,
+        message: "Update user successful!",
+        user: updateResult.user
+      })
+    }
+    return res.status(400).json({
+      success: true,
+      message: updateResult.message
+    })
+}
+
 module.exports = {
     login,
-    register
+    register,
+    update
 }
