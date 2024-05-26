@@ -67,8 +67,8 @@ const update = async (req, res, next) => {
     if (req.files) {
       data = {
         ...data,
-        avatar: req.files.avatar[0],
-        banner: req.files.banner[0]
+        avatar: req.files.avatar[0].data,
+        banner: req.files.banner[0].data
       }
     }
     const updateResult = await userService.updateUser(data);
