@@ -10,7 +10,10 @@ const User = sequelize.define('User', {
     avatar: DataTypes.BLOB,
     banner: DataTypes.BLOB,
     created_at: DataTypes.DATE,
-    subscriberCount: DataTypes.NUMBER,
+    subscriberCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
     facebook: DataTypes.STRING,
     description: DataTypes.STRING
   });

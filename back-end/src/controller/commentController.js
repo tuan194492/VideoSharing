@@ -87,6 +87,7 @@ const addComment = async (req, res, next) => {
 
 const deleteComment = async (req, res, next) => {
 	const id = req.params.commentId;
+	console.log(id)
 	const comment = await commentService.findCommentById(id);
 	if (comment) {
 		console.log(comment);
@@ -96,24 +97,26 @@ const deleteComment = async (req, res, next) => {
 				message: "Only own use can delete this comment",
 			});
 		}
+		const result = await commentService.deleteComment(id);
+		console.log(result)
+		if (result.success) {
+			return res.status(200).json({
+				success: true,
+				message: result.message,
+			});
+		} else {
+			return res.status(400).json({
+				success: false,
+				message: result.message,
+			});
+		}
 	} else {
 		return res.status(400).json({
 			success: false,
 			message: "Comment not found",
 		});
 	}
-	const result = await commentService.deleteComment(id);
-	if (result.success) {
-		return res.status(200).json({
-			success: true,
-			message: result.message,
-		});
-	} else {
-		return res.status(400).json({
-			success: false,
-			message: result.message,
-		});
-	}
+
 };
 
 module.exports = {

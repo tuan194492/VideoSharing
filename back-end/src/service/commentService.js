@@ -66,7 +66,7 @@ const deleteComment = async (commentId) => {
       include: [
         {
           model: Video,
-          as: 'video'
+          as: 'Video'
         }
       ]
     });
@@ -76,9 +76,10 @@ const deleteComment = async (commentId) => {
         message: "Delete comment successful",
       };
     }
-    const video = comment.video;
+    console.log(comment);
+    const video = comment.Video;
     if (video) {
-      video.commentCount++;
+      video.commentCount--;
       await video.save();
     }
     await Comment.destroy({

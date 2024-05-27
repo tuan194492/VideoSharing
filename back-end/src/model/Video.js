@@ -7,14 +7,26 @@ const Video = sequelize.define('Video', {
     title: DataTypes.TEXT,
     description: DataTypes.TEXT,
     keywords: DataTypes.STRING,
-    commentCount: DataTypes.INTEGER,
+    commentCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
     status: DataTypes.CHAR,
     views: DataTypes.INTEGER,
     thumbnail: DataTypes.BLOB('long'),
     created_at: DataTypes.DATE,
-    video_length_in_seconds: DataTypes.INTEGER,
-    likeCount: DataTypes.INTEGER,
-    dislikeCount: DataTypes.INTEGER,
+    video_length_in_seconds: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    likeCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    dislikeCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
 }, {
       indexes: [
         {
