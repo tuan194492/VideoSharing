@@ -1,7 +1,7 @@
 const express = require("express");
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
-
+const playlistService = require("../service/playlistService");
 const validateNewUser = async (newUser) => {
   const { email } = newUser;
   const user = await User.findOne({
@@ -27,6 +27,8 @@ const createNewUser = async (user) => {
   const hashedPassword = await bcrypt.hash(user.password, 10);
   if (res.success) {
     const result = await User.create({ ...user, password: hashedPassword });
+    console.log(result)
+    await playlistService.createDefaultPlaylistForUser(result.dataValues);
     return {
       success: true,
       message: "Create User Successful",

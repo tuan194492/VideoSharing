@@ -26,6 +26,31 @@ const getPlaylistDetail = async (req, res, next) => {
     }
 }
 
+const getWatchLaterPlaylistDetail = async (req, res, next) => {
+  const user = req?.user;
+  if (!user) {
+    return res.status(400).json({
+      success: false,
+      message: 'Can not find user',
+      data: []
+    })
+  }
+  const getPlaylistResult = await playlistService.getWatchLaterPlaylist(user);
+  if (getPlaylistResult.success) {
+    return res.status(200).json({
+      success: true,
+      message: 'Get playlist successful',
+      data: getPlaylistResult.playlist
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: getPlaylistResult.message,
+      data: []
+    })
+  }
+}
+
 const getPublicPlaylistListOfChannel = async (req, res, next) => {
   console.log(req.params.channelId)
   const result = await playlistService.findPlaylistByChannelId(req.params.channelId, true);
@@ -170,5 +195,6 @@ module.exports = {
   removeVideoFromPlaylist,
   createPlaylist,
   deletePlaylist,
-  isAddedToPlaylist
+  isAddedToPlaylist,
+  getWatchLaterPlaylistDetail
 }

@@ -4,6 +4,7 @@ const authMiddleware = require('../middlleware/authMiddleware');
 const playlistController = require("../controller/playlistController");
 
 router.get('/detail/:playlistId', authMiddleware.getUserToken, playlistController.getPlaylistDetail);
+router.get('/watch-later', authMiddleware.getUserToken, playlistController.getWatchLaterPlaylistDetail);
 router.get('/public/channel/:playlistId', playlistController.getPlaylistDetail);
 router.get('/public/:channelId', authMiddleware.getUserToken, playlistController.getPublicPlaylistListOfChannel);
 router.get('/all', authMiddleware.authenticateToken, playlistController.getAllPlaylistListOfChannel);

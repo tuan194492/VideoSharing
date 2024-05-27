@@ -46,6 +46,23 @@ const getPlaylistById = async (user, playlistId) => {
   }
 }
 
+const getWatchLaterPlaylist = async (user) => {
+
+  const playlist = await Playlist.findOne({
+    where: {
+      publisher_id: user.userId,
+      title: 'Watch later'
+    } ,
+    include: [Video, User],
+  })
+  console.log(playlist)
+  return {
+    success: true,
+    message: 'Get playlist successful',
+    playlist: playlist
+  }
+}
+
 const getPublicPlaylistInfoById = async (playlistId) => {
   const playlist = await Playlist.findByPk(playlistId,
     {
@@ -274,6 +291,34 @@ const isAddedToPlaylist = async (videoId, playlistId) => {
   }
 }
 
+const createDefaultPlaylistForUser = async (user) => {
+    try {
+      console.log(user)
+      user = {
+        ...user,
+        userId: user.id
+      }
+      const watchLaterData = {
+        publisher_id: user.id,
+        title: 'Watch later',
+        description: 'Watch later',
+        status: VIDEO_STATUS.PRIVATE
+      }
+      const result = await createPlaylist(user, watchLaterData);
+      return {
+        success: true,
+        data: result.data
+      }
+    } catch (err) {
+      console.log(err);
+      return {
+        success: false,
+        isAddedToPlaylist: true,
+        message: err.message
+      }
+    }
+}
+
 module.exports = {
     getPlaylistById,
     addVideoToPlaylist,
@@ -282,5 +327,7 @@ module.exports = {
     createPlaylist,
     deletePlaylist,
     isAddedToPlaylist,
-    getPublicPlaylistInfoById
+    getPublicPlaylistInfoById,
+  createDefaultPlaylistForUser,
+  getWatchLaterPlaylist
 }

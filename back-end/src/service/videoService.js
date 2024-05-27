@@ -1,6 +1,7 @@
 const express = require("express");
 const Sequelize = require("sequelize");
 const Video = require("../model/Video");
+const User = require("../model/User");
 const Reaction = require("../model/Reaction");
 const Subcriber = require("../model/Subcriber");
 const fileUtils = require("../utils/video/FileUtils");
@@ -297,10 +298,11 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
 			where: {
 				[Sequelize.Op.or]: [
 					Sequelize.literal(
-						`MATCH(title, description) AGAINST('+${searchQuery}*' IN BOOLEAN MODE)`
+						`MATCH(Video.title, Video.description) AGAINST('+${searchQuery}*' IN BOOLEAN MODE)`
 					),
 				],
 			},
+      include: User,
 			page: page - 1,
 			limit: pageSize,
 			order: [['views', 'DESC']]

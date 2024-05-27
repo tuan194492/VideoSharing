@@ -7,8 +7,8 @@ const User = sequelize.define('User', {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     status: DataTypes.CHAR,
-    avatar: DataTypes.BLOB,
-    banner: DataTypes.BLOB,
+    avatar: DataTypes.BLOB('long'),
+    banner: DataTypes.BLOB('long'),
     created_at: DataTypes.DATE,
     subscriberCount: {
         type: DataTypes.INTEGER,
