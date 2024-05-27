@@ -22,6 +22,8 @@ const initRelation = () => {
     Video.belongsToMany(Playlist, {through: 'PlaylistVideo'});
     Playlist.belongsToMany(Video, {through: 'PlaylistVideo'});
 
+    Video.hasMany(Reaction, {foreignKey: 'video_id'});
+
 }
 
 const databaseInit = () => {

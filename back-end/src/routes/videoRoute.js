@@ -21,18 +21,19 @@ const videoMiddleware = require('../middlleware/videoMiddleware');
  *                 type: string
  *                 format: binary
  *     responses:
- *          201: 
+ *          201:
  *              description: Success
  *          500:
  *              description: Internal Server error
- *   
- * 
+ *
+ *
  * */
 
 router.get('/watch', videoController.getViewerVideoList);
 router.get('/get-by-publisher/:publisherId', authMiddleware.getUserToken, videoController.getVideoByPublisherId);
+router.get('/liked-video', authMiddleware.getUserToken, videoController.getLikedVideoByUser);
 router.get('/similarUser/:userId', videoController.getSimilarUsers);
-router.post('/search', videoController.searchVideos); 
+router.post('/search', videoController.searchVideos);
 router.get('/stream/:id', videoController.streamVideoById);
 router.get('/data/:id', videoController.getVideoDataById);
 router.get('/:id',  authMiddleware.getUserToken, videoController.getVideoById);

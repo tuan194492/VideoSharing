@@ -289,6 +289,40 @@ const getSimilarUsers = async (req, res, next) => {
 	});
 }
 
+const getLikedVideoByUser = async (req, res, next) => {
+  const userId = req?.user?.userId;
+  const result = await videoService.getLikedVideoByUser(userId);
+  console.log(result)
+  if (result.success) {
+    let videos = [];
+    for (let video of result.data.rows) {
+      const data = await userService.getUserById(
+        video.dataValues.publisher_id
+      );
+      const user = data.success ? data.user : null;
+      if (video.dataValues.publisher_id != userId && video.dataValues.status != VIDEO_STATUS.PUBLIC) {
+        continue;
+      } else {
+        videos.push({
+          ...video.dataValues,
+          user_name: user?.name || "No name",
+        });
+      }
+
+    }
+    return res.status(200).json({
+      success: true,
+      count: result.data.count,
+      data: videos,
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+    });
+  }
+};
+
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -299,5 +333,6 @@ module.exports = {
 	getViewerVideoList,
 	searchVideos,
 	getVideoByPublisherId,
-	getSimilarUsers
+	getSimilarUsers,
+  getLikedVideoByUser
 };

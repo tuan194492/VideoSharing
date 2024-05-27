@@ -348,6 +348,38 @@ const getMostWatchedVideos = async (videoNumbers) => {
 	}
 }
 
+const getLikedVideoByUser = async (userId) => {
+  try {
+      const result = await Video.findAndCountAll({
+        where: {
+        },
+        include:
+          {
+            model: Reaction,
+            where: {
+              type: REACTION_TYPE.LIKE,
+              user_id: userId
+            },
+            required: true
+          },
+        order: [
+          [Reaction, 'createdAt', 'DESC']
+        ]
+
+      });
+      return {
+        success: true,
+        message: "Get video list successfull",
+        data: result,
+      };
+  } catch (e) {
+    return {
+      success: false,
+      message: e,
+    };
+  }
+}
+
 module.exports = {
 	createVideo,
 	findVideoById,
@@ -357,5 +389,6 @@ module.exports = {
 	fullTextSearchVideo,
 	getVideoByPublisherId,
 	addViewForVideo,
-	getMostWatchedVideos
+	getMostWatchedVideos,
+  getLikedVideoByUser
 };
