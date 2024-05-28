@@ -38,7 +38,8 @@ router.get('/stream/:id', videoController.streamVideoById);
 router.get('/data/:id', videoController.getVideoDataById);
 router.get('/:id',  authMiddleware.getUserToken, videoController.getVideoById);
 router.post('/', authMiddleware.authenticateToken, videoMiddleware.validateUpload, videoController.createVideo);
-router.put('/:id', authMiddleware.authenticateToken ,videoController.updateVideo);
+router.post('/:id', authMiddleware.authenticateToken, videoController.updateVideo);
+// router.put('/:id', authMiddleware.authenticateToken ,videoController.updateVideo);
 router.delete('/:id', authMiddleware.authenticateToken ,videoController.deleteVideo);
 
 module.exports = router;

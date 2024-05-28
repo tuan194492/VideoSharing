@@ -291,6 +291,37 @@ const isAddedToPlaylist = async (videoId, playlistId) => {
   }
 }
 
+const updatePlaylist = async (user, playlistData) => {
+  try {
+    console.log(playlistData)
+    const authorizeResult = await authorizeUser(user, playlistData.id);
+    if (!authorizeResult.success) {
+      return authorizeResult;
+    }
+    const playlist = await Playlist.findByPk(playlistData.id);
+    if (playlist) {
+      await playlist.update({
+        ...playlistData
+      })
+      return {
+        success: true,
+        message: 'Update playlist successful'
+      }
+    } else {
+      return {
+        success: true,
+        message: 'Update playlist not successful'
+      }
+    }
+  } catch (err) {
+    console.log(err);
+    return {
+      success: false,
+      message: err.message
+    };
+  }
+}
+
 const createDefaultPlaylistForUser = async (user) => {
     try {
       console.log(user)
@@ -329,5 +360,6 @@ module.exports = {
     isAddedToPlaylist,
     getPublicPlaylistInfoById,
   createDefaultPlaylistForUser,
-  getWatchLaterPlaylist
+  getWatchLaterPlaylist,
+  updatePlaylist
 }

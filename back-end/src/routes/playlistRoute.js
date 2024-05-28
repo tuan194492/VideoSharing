@@ -9,6 +9,7 @@ router.get('/public/channel/:playlistId', playlistController.getPlaylistDetail);
 router.get('/public/:channelId', authMiddleware.getUserToken, playlistController.getPublicPlaylistListOfChannel);
 router.get('/all', authMiddleware.authenticateToken, playlistController.getAllPlaylistListOfChannel);
 router.post('/create-playlist', authMiddleware.authenticateToken, playlistController.createPlaylist);
+router.post('/update', authMiddleware.authenticateToken, playlistController.updatePlaylist);
 router.post('/delete-playlist/:playlistId', authMiddleware.authenticateToken, playlistController.deletePlaylist);
 router.post('/add-video-to-playlist', authMiddleware.authenticateToken, playlistController.addVideoToPlaylist);
 router.post('/remove-video-from-playlist', authMiddleware.authenticateToken, playlistController.removeVideoFromPlaylist);

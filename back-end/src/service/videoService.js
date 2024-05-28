@@ -108,7 +108,7 @@ const getVideoByPublisherId = async (data) => {
 	}
 };
 
-const updateVideo = async (videoData, id) => {
+const updateVideo = async (videoData, thumbnail, id) => {
 	try {
 		const video = await Video.findByPk(id);
 		if (video) {
@@ -116,6 +116,9 @@ const updateVideo = async (videoData, id) => {
 			const { title, description } = videoData;
 			video.title = title;
 			video.description = description;
+      if (thumbnail) {
+        video.thumbnail = thumbnail;
+      }
 			await video.save();
 			return {
 				success: true,

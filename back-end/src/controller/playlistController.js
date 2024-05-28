@@ -119,6 +119,21 @@ const deletePlaylist = async (req, res, next) => {
   }
 }
 
+const updatePlaylist = async (req, res, next) => {
+  const result = await playlistService.updatePlaylist(req.user, req.body);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: 'Delete playlist successful'
+    })
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    })
+  }
+}
+
 const addVideoToPlaylist = async (req, res, next) => {
   const result = await playlistService.addVideoToPlaylist(req.user, req.body.playlistId, req.body.videoId);
   if (result.success) {
@@ -196,5 +211,6 @@ module.exports = {
   createPlaylist,
   deletePlaylist,
   isAddedToPlaylist,
-  getWatchLaterPlaylistDetail
+  getWatchLaterPlaylistDetail,
+  updatePlaylist
 }

@@ -40,7 +40,7 @@ const createVideo = async (req, res, next) => {
 
 const updateVideo = async (req, res, next) => {
 	const id = req.params.id;
-	const result = await videoService.updateVideo(req.body, id);
+	const result = await videoService.updateVideo(req.body, req.files?.thumbnail, id);
 	if (result.success) {
 		return res.status(200).json({
 			success: true,
