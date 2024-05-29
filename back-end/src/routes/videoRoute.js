@@ -30,6 +30,7 @@ const videoMiddleware = require('../middlleware/videoMiddleware');
  * */
 
 router.get('/watch', videoController.getViewerVideoList);
+router.get('/watched-video', authMiddleware.getUserToken, videoController.getWatchedVideoByUserId);
 router.get('/get-by-publisher/:publisherId', authMiddleware.getUserToken, videoController.getVideoByPublisherId);
 router.get('/liked-video', authMiddleware.getUserToken, videoController.getLikedVideoByUser);
 router.get('/similarUser/:userId', videoController.getSimilarUsers);

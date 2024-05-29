@@ -359,7 +359,7 @@ module.exports = {
     deletePlaylist,
     isAddedToPlaylist,
     getPublicPlaylistInfoById,
-  createDefaultPlaylistForUser,
-  getWatchLaterPlaylist,
-  updatePlaylist
+    createDefaultPlaylistForUser,
+    getWatchLaterPlaylist,
+    updatePlaylist
 }
