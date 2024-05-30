@@ -14,8 +14,8 @@ const initRelation = () => {
     Comment.belongsTo(Video, { foreignKey: 'video_id' });
     Reaction.belongsTo(User, { foreignKey: 'user_id' });
     Reaction.belongsTo(Video, { foreignKey: 'video_id' });
-    Subscriber.belongsTo(User, { foreignKey: 'publisher_id' });
-    Subscriber.belongsTo(User, { foreignKey: 'subscriber_id' });
+    Subscriber.belongsTo(User, { as: 'Publisher', foreignKey: 'publisher_id' });
+    Subscriber.belongsTo(User, { as: 'User', foreignKey: 'subscriber_id' });
     Notification.belongsTo(User, { foreignKey: 'actor' });
     Notification.belongsTo(User, { foreignKey: 'notifer' });
     Playlist.belongsTo(User, {foreignKey: 'publisher_id'})

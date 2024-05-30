@@ -63,6 +63,7 @@ const getChannelSubcribers = async (req, res, next) => {
 
 const getChannelSubcribeTo = async (req, res, next) => {
     const userId = req.user.userId;
+    console.log(userId)
     const subcribeResult = await subcriberService.getListOfSubcribedChannel(userId);
     if (subcribeResult.success) {
         return res.status(200).json({

@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../model/User");
 const Subcriber = require("../model/Subcriber");
 const userService = require("../service/userService");
+const {Sequelize} = require("sequelize");
 
 const subcribeToUser = async (userId, channelId) => {
   try {
@@ -64,6 +65,7 @@ const unsubcribeToUser = async (userId, channelId) => {
       };
     }
   } catch (e) {
+    console.log(e)
     return {
       success: false,
       message: "User or channel not found",
@@ -79,6 +81,14 @@ const getListOfSubcribersByChannelId = async (channelId) => {
         where: {
           publisher_id: channelId,
         },
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: ["id", "name", "avatar", "shortname", "subscriberCount"],
+            required: true
+          }
+        ]
       });
       return {
         success: true,
@@ -102,12 +112,21 @@ const getListOfSubcribersByChannelId = async (channelId) => {
 
 const getListOfSubcribedChannel = async (userId) => {
     try {
+      console.log(userId)
         const channel = await User.findByPk(userId);
         if (channel) {
           const data = await Subcriber.findAll({
             where: {
               subscriber_id: userId,
             },
+            include: [
+              {
+                model: User,
+                as: 'Publisher',
+                attributes: ["id", "name", "avatar", "shortname", "subscriberCount"],
+                required: true
+              }
+            ]
           });
           return {
             success: true,
@@ -121,6 +140,7 @@ const getListOfSubcribedChannel = async (userId) => {
           };
         }
       } catch (e) {
+      console.log(e)
         return {
           succes: false,
           data: [],
