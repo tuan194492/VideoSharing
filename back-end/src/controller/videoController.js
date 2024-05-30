@@ -323,6 +323,24 @@ const getLikedVideoByUser = async (req, res, next) => {
   }
 };
 
+const getWatchedVideoByUserId = async (req, res, next) => {
+	const userId = req?.user?.userId;
+	if (!userId) {
+		return res.status(400).json({
+			success: false,
+			message: 'User not found'
+		})
+	}
+
+	const result = await videoService.getWatchedVideoList(userId, null);
+	return res.status(200).json({
+		success: true,
+		data: result.data,
+		message: 'Get watched video list successful'
+	})
+
+};
+
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -334,5 +352,6 @@ module.exports = {
 	searchVideos,
 	getVideoByPublisherId,
 	getSimilarUsers,
-  getLikedVideoByUser
+  getLikedVideoByUser,
+	getWatchedVideoByUserId
 };

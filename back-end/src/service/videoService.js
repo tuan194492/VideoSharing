@@ -5,7 +5,8 @@ const User = require("../model/User");
 const Reaction = require("../model/Reaction");
 const Subcriber = require("../model/Subcriber");
 const fileUtils = require("../utils/video/FileUtils");
-const { VIDEO_STATUS, REACTION_TYPE } = require("../constant/enum/ENUM");
+const { VIDEO_STATUS, REACTION_TYPE, USER_ACTION} = require("../constant/enum/ENUM");
+const {Log} = require("../model/Log");
 
 const createVideo = async (meta, file, user) => {
 	const url = fileUtils.createUrlForVideo(file, user);
@@ -383,6 +384,25 @@ const getLikedVideoByUser = async (userId) => {
   }
 }
 
+const getWatchedVideoList = async (userId, params) => {
+	try {
+		const logList = await Log.find({
+			action: USER_ACTION.WATCH,
+			userId: userId
+		}).exec();
+		return {
+			success: true,
+			data: logList
+		}
+
+	} catch (err) {
+		return {
+			success: false,
+			data: {}
+		}
+	}
+}
+
 module.exports = {
 	createVideo,
 	findVideoById,
@@ -393,5 +413,6 @@ module.exports = {
 	getVideoByPublisherId,
 	addViewForVideo,
 	getMostWatchedVideos,
-  getLikedVideoByUser
+  	getLikedVideoByUser,
+	getWatchedVideoList
 };
