@@ -3,6 +3,7 @@ const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
 const { USER_ACTION_POINT, USER_ACTION } = require("../constant/enum/ENUM");
+const Video = require("../model/Video");
 /*
     Params:
         userId: id người dùng
@@ -11,11 +12,14 @@ const { USER_ACTION_POINT, USER_ACTION } = require("../constant/enum/ENUM");
         createdAt: thời điểm của hành động
 */
 const createLog = async (params) => {
-	const log = new Log({
+  const video = await Video.findByPk(params.videoId);
+  const log = new Log({
 		userId: params.userId,
 		action: params.action,
 		videoId: params.videoId,
+    channelId: video.publisher_id
 	});
+
 	log.save();
 	// Change react point
 	const recommendPoint = await RecommendPoints.findOne({

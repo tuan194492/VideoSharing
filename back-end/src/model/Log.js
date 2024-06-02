@@ -12,7 +12,12 @@ const LogSchema = new mongoose.Schema({
   videoId: {
     type: Number,
     required: true,
+  },
+  channelId: {
+    type: Number,
+    required: true,
   }
+
 }, {
     timestamps: true
 });
