@@ -22,8 +22,8 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
       } },
     {
       $group: {
-        _id: { $dateToString: { format: "%Y-%m-%d", date: "$timestamp" } },
-        logs: { $push: "$$ROOT" }
+        _id: {$dateToString: {format: "%Y-%m-%d", date: "$createdAt"}},
+        viewCount: {$sum: 1}
       }
     },
     { $sort: { _id: 1 } }])
