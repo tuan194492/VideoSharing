@@ -28,7 +28,7 @@ const initRelation = () => {
 
 const databaseInit = () => {
     initRelation();
-    sequelize.sync({alter:true})
+    sequelize.sync({alter:false})
         .then(() => {
             console.log('Models synchronized with the database.');
             // You can start your Express server or perform other operations here

@@ -8,6 +8,8 @@ const fileUtils = require("../utils/video/FileUtils");
 const { VIDEO_STATUS, REACTION_TYPE, USER_ACTION} = require("../constant/enum/ENUM");
 const {Log} = require("../model/Log");
 
+
+const MAX_LIMIT = 1024;
 const createVideo = async (meta, file, user) => {
 	const url = fileUtils.createUrlForVideo(file, user);
 	const shortenUrl = fileUtils.createShortenUrlForVideo(file, user);
@@ -386,13 +388,34 @@ const getLikedVideoByUser = async (userId) => {
 
 const getWatchedVideoList = async (userId, params) => {
 	try {
-		const logList = await Log.find({
+    let {page, pageSize} = params;
+    page = page? parseInt(page) : 1;
+    pageSize = pageSize? parseInt(pageSize) : MAX_LIMIT;
+    const logList = await Log.find({
 			action: USER_ACTION.WATCH,
 			userId: userId
-		}).exec();
+		})
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .sort({
+      createdAt: 'DESC'
+    })
+      .exec();
+
+    const result = [];
+    for (let watchedVideoLog of logList) {
+        // console.log(watchedVideoLog);
+       const watchedVideoData = await Video.findByPk(watchedVideoLog.videoId);
+       // console.log(watchedVideoData);
+       result.push({
+         ...watchedVideoLog._doc,
+         Video: watchedVideoData.dataValues
+       });
+    }
+
 		return {
 			success: true,
-			data: logList
+			data: result
 		}
 
 	} catch (err) {
@@ -401,6 +424,24 @@ const getWatchedVideoList = async (userId, params) => {
 			data: {}
 		}
 	}
+}
+
+const deleteWatchedHistory = async (userId) => {
+  try {
+    await Log.deleteMany({
+      userId: userId,
+      action: USER_ACTION.WATCH
+    }).exec();
+    return {
+      success: true,
+      message: "Delete watched history successful"
+    }
+  } catch (err) {
+    return {
+      success: false,
+      message: err
+    }
+  }
 }
 
 module.exports = {
@@ -414,5 +455,6 @@ module.exports = {
 	addViewForVideo,
 	getMostWatchedVideos,
   	getLikedVideoByUser,
-	getWatchedVideoList
+	getWatchedVideoList,
+  deleteWatchedHistory
 };

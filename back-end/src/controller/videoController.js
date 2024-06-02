@@ -324,7 +324,8 @@ const getLikedVideoByUser = async (req, res, next) => {
 };
 
 const getWatchedVideoByUserId = async (req, res, next) => {
-	const userId = req?.user?.userId;
+	const userId = req?.user?.userId
+  const params = req.query;
 	if (!userId) {
 		return res.status(400).json({
 			success: false,
@@ -332,14 +333,30 @@ const getWatchedVideoByUserId = async (req, res, next) => {
 		})
 	}
 
-	const result = await videoService.getWatchedVideoList(userId, null);
+	const result = await videoService.getWatchedVideoList(userId, params);
 	return res.status(200).json({
 		success: true,
 		data: result.data,
 		message: 'Get watched video list successful'
 	})
-
 };
+
+const deleteWatchedVideoByUserId = async (req, res, next) => {
+  const userId = req?.user?.userId
+  if (!userId) {
+    return res.status(400).json({
+      success: false,
+      message: 'User not found'
+    })
+  }
+
+  const result = await videoService.deleteWatchedHistory(userId);
+  return res.status(200).json({
+    success: true,
+    data: result.data,
+    message: 'Delete watched video successful'
+  })
+}
 
 module.exports = {
 	createVideo,
@@ -353,5 +370,6 @@ module.exports = {
 	getVideoByPublisherId,
 	getSimilarUsers,
   getLikedVideoByUser,
-	getWatchedVideoByUserId
+	getWatchedVideoByUserId,
+  deleteWatchedVideoByUserId
 };
