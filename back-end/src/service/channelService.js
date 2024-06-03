@@ -6,9 +6,12 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
   const defaultDayAgo = 7;
   if (!endDate) {
     endDate = new Date();
+    console.log(endDate)
   }
   if (!startDate) {
-    startDate = new Date(new Date().getDate() - defaultDayAgo);
+    const date = new Date();
+    startDate = new Date(date.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
+    console.log(startDate)
   }
   const logs = await Log.aggregate([
     { $match:
@@ -28,9 +31,27 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
     },
     { $sort: { _id: 1 } }])
   console.log(logs);
+  const result = [];
+  const logMap = new Map(logs.map(log => [log._id, log.viewCount]));
+
+  // Check for start date
+  const startStr = startDate.toISOString().split('T')[0];
+  result.push({
+    _id: startStr,
+    viewCount: logMap.get(startStr) || 0
+  });
+
+  // Check for end date
+  const endStr = endDate.toISOString().split('T')[0];
+  result.push({
+    _id: endStr,
+    viewCount: logMap.get(endStr) || 0
+  });
+
+  console.log(result);
   return {
     success: true,
-    data: logs
+    data: result
   }
   // Optional: sort by date
 }
