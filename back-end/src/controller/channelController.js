@@ -48,8 +48,25 @@ const getChannelSubscriberAnalyst = async (req, res, next) => {
   }
 }
 
+const getMostWatchedVideos = async (req, res, next) => {
+  const result = await channelService.mostWatchedVideoByDate(req.params.channelId);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: 'Success',
+      data: result.data
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    });
+  }
+}
+
 module.exports = {
   findChannelById,
   getChannelViewAnalyst,
-  getChannelSubscriberAnalyst
+  getChannelSubscriberAnalyst,
+  getMostWatchedVideos
 }

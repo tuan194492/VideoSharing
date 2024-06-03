@@ -1,5 +1,7 @@
 const { Log } = require("../model/Log");
 const Subscriber = require("../model/Subcriber");
+const Video = require("../model/Video");
+
 const sequelize = require("../utils/database/sequelize")
 const {USER_ACTION} = require("../constant/enum/ENUM");
 const Sequelize = require("sequelize");
@@ -124,7 +126,58 @@ const getSubscriberCountByChannel =  async (channelId, startDate, endDate) => {
   }
 }
 
+const mostWatchedVideoByDate = async (channelId, numberOfVideo, endDate, dayAgo) => {
+    const defaultDayAgo = 7;
+    if (!numberOfVideo) {
+      numberOfVideo = 5;
+    }
+    if (!endDate) {
+      endDate = new Date();
+      console.log(endDate)
+    }
+    if (!dayAgo) {
+      dayAgo = defaultDayAgo;
+    }
+    const startDate = new Date(endDate.getTime() - dayAgo * 24 * 60 * 60 * 1000);
+    const logs = await Log.aggregate([
+      { $match:
+          {
+            action: USER_ACTION.WATCH,
+            channelId: parseInt(channelId, 10),
+            createdAt: {
+              $gte: new Date(startDate),
+              $lte: new Date(endDate)
+            }
+        } },
+      {
+        $group: {
+          _id: "$videoId",
+          viewCount: {$sum: 1}
+        }
+      },
+      { $sort: { viewCount: -1 } },
+      { $limit: parseInt(numberOfVideo) }])
+    console.log(logs);
+    const result = [];
+    for (let log of logs) {
+      const video = await Video.findByPk(log._id);
+      if (video) {
+        result.push({
+          videoId: log._id,
+          viewCount: log.viewCount,
+          title: video.title,
+          thumbnail: video.thumbnail
+        });
+      }
+    }
+    return {
+      success: true,
+      data: result
+    }
+}
+
 module.exports  = {
   getViewCountByChannel,
-  getSubscriberCountByChannel
+  getSubscriberCountByChannel,
+  mostWatchedVideoByDate
 }
