@@ -166,7 +166,8 @@ const mostWatchedVideoByDate = async (channelId, numberOfVideo, endDate, dayAgo)
           videoId: log._id,
           viewCount: log.viewCount,
           title: video.title,
-          thumbnail: video.thumbnail
+          thumbnail: video.thumbnail,
+          createdAt: video.createdAt
         });
       }
     }
