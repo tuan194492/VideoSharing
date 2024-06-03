@@ -1,5 +1,8 @@
 const { Log } = require("../model/Log");
+const Subscriber = require("../model/Subcriber");
+const sequelize = require("../utils/database/sequelize")
 const {USER_ACTION} = require("../constant/enum/ENUM");
+const Sequelize = require("sequelize");
 
 const getViewCountByChannel =  async (channelId, startDate, endDate) => {
   console.log(channelId)
@@ -31,22 +34,26 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
     },
     { $sort: { _id: 1 } }])
   console.log(logs);
-  const result = [];
+  const result = [...logs];
   const logMap = new Map(logs.map(log => [log._id, log.viewCount]));
 
   // Check for start date
   const startStr = startDate.toISOString().split('T')[0];
-  result.push({
-    _id: startStr,
-    viewCount: logMap.get(startStr) || 0
-  });
+  if (!logMap.has(startStr)) {
+    result.push({
+      _id: startStr,
+      viewCount: logMap.get(startStr) || 0
+    });
+  }
 
   // Check for end date
   const endStr = endDate.toISOString().split('T')[0];
-  result.push({
-    _id: endStr,
-    viewCount: logMap.get(endStr) || 0
-  });
+  if (!logMap.has(endStr)) {
+    result.push({
+      _id: endStr,
+      viewCount: logMap.get(endStr) || 0
+    });
+  }
 
   console.log(result);
   return {
@@ -56,6 +63,68 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
   // Optional: sort by date
 }
 
+const getSubscriberCountByChannel =  async (channelId, startDate, endDate) => {
+  const defaultDayAgo = 7;
+  if (!endDate) {
+    endDate = new Date();
+    console.log(endDate)
+  }
+  if (!startDate) {
+    const date = new Date();
+    startDate = new Date(date.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
+    console.log(startDate)
+  }
+
+
+   // Replace with the actual publisher_id you want to filter
+  const subscribers = await Subscriber.findAll({
+    attributes: [
+      'publisher_id',
+      [Sequelize.fn('DATE', Sequelize.col('createdAt')), 'date'],
+      [Sequelize.fn('COUNT', Sequelize.col('subscriber_id')), 'subscriberCount']
+    ],
+    where: {
+      publisher_id: channelId,
+      createdAt: {
+        [Sequelize.Op.between]: [startDate, endDate]
+      }
+    },
+    group: ['publisher_id', 'createdAt'],
+    order: [['publisher_id', 'ASC'], ['createdAt', 'ASC']]
+  })
+
+  const logMap = new Map(subscribers.map(log => {
+    console.log(log.dataValues)
+    return [log.dataValues.date, log.dataValues.subscriberCount]
+  }
+      ));
+  console.log(logMap)
+  const result = [...subscribers];
+// Check for start date
+  const startStr = startDate.toISOString().split('T')[0];
+  if (!logMap.has(startStr)) {
+    result.push({
+      date: startStr,
+      subscriberCount: logMap.get(startStr) || 0
+    });
+  }
+
+  // Check for end date
+  const endStr = endDate.toISOString().split('T')[0];
+  if (!logMap.has(endStr)) {
+    result.push({
+      date: endStr,
+      subscriberCount: logMap.get(endStr) || 0
+    });
+  }
+
+  return {
+    success: true,
+    data: result
+  }
+}
+
 module.exports  = {
-  getViewCountByChannel
+  getViewCountByChannel,
+  getSubscriberCountByChannel
 }
