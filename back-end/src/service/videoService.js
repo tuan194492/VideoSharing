@@ -7,14 +7,28 @@ const Subcriber = require("../model/Subcriber");
 const fileUtils = require("../utils/video/FileUtils");
 const { VIDEO_STATUS, REACTION_TYPE, USER_ACTION} = require("../constant/enum/ENUM");
 const {Log} = require("../model/Log");
+const {Transcoder} = require("simple-hls")
+const { getVideoDurationInSeconds } = require('get-video-duration')
+const fs = require("fs");
 
+const transcodeFile = async (filePath, parentPath) => {
+  const t = new Transcoder(`${filePath}`, `${parentPath}`, {showLogs: false});
+  try {
+    const hlsPath = await t.transcode();
+    console.log('Successfully Transcoded Video');
+  } catch(e){
+    console.log('Something went wrong');
+  }
+}
 
 const MAX_LIMIT = 1024;
 const createVideo = async (meta, file, user) => {
 	const url = fileUtils.createUrlForVideo(file, user);
+  const parentUrl = fileUtils.getUserPathForVideo(file, user);
 	const shortenUrl = fileUtils.createShortenUrlForVideo(file, user);
 	const storeResult = await storeVideo(file, url);
-  const videoLength = file.duration;
+  console.log(file)
+  const videoLength = await getVideoDurationInSeconds(url);
   console.log('Video length: ', videoLength)
   meta = {
     ...meta,
@@ -25,7 +39,12 @@ const createVideo = async (meta, file, user) => {
 		const ress = await createVideoMetaData(meta, shortenUrl, user);
 		if (ress.success) {
 			const videoId = ress.data;
-			return {
+      let storePath = parentUrl + '/' + videoId;
+      if (!fs.existsSync(storePath)){    //check if folder already exists
+        fs.mkdirSync(storePath);    //creating folder
+      }
+      transcodeFile(url, storePath);
+      return {
 				success: true,
 				message: "Upload File successful",
 				videoId: videoId,
