@@ -36,6 +36,7 @@ router.get('/get-by-publisher/:publisherId', authMiddleware.getUserToken, videoC
 router.get('/liked-video', authMiddleware.getUserToken, videoController.getLikedVideoByUser);
 router.get('/similarUser/:userId', videoController.getSimilarUsers);
 router.post('/search', videoController.searchVideos);
+router.get('/stream-multi-res/:videoId', authMiddleware.getUserToken, videoController.streamMultipleResolutionsVideo);
 router.get('/stream/:id', videoController.streamVideoById);
 router.get('/data/:id', videoController.getVideoDataById);
 router.get('/:id',  authMiddleware.getUserToken, videoController.getVideoById);

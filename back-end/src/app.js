@@ -19,7 +19,7 @@ app.use(cors()) // Use this after the variable declaration
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "../public")))
 app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
 }));
@@ -86,7 +86,6 @@ setInterval(() => {
 
 io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
-  io.emit('message', {message: 'welcome ' + socket.id})
   socket.on("disconnect", () => {
     console.log("🔥: A user disconnected");
   });

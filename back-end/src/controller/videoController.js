@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 15 * 60 });
+const path = require("path");
 const videoService = require("../service/videoService");
 const userService = require("../service/userService");
 const notifyService = require("../service/notifyService");
@@ -358,6 +359,33 @@ const deleteWatchedVideoByUserId = async (req, res, next) => {
   })
 }
 
+const streamMultipleResolutionsVideo = async (req, res, next) => {
+  try {
+    const videoId = req.params.videoId;
+    console.log(videoId)
+    const findVideo = await videoService.findVideoById(videoId, req?.user?.id);
+    console.log(findVideo)
+    if (!findVideo.success) {
+      return res.status(404).json({
+        success: false,
+        message: 'Video not found'
+      })
+    }
+    const video = findVideo.data;
+    const videoPath = `/${video.publisher_id}/${video.id}/index.m3u8`;
+    return res.status(200).json({
+      success: true,
+      data: videoPath
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(404).json({
+      success: false,
+      message: 'Video not found'
+    })
+  }
+}
+
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -371,5 +399,6 @@ module.exports = {
 	getSimilarUsers,
   getLikedVideoByUser,
 	getWatchedVideoByUserId,
-  deleteWatchedVideoByUserId
+  deleteWatchedVideoByUserId,
+  streamMultipleResolutionsVideo
 };
