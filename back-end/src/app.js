@@ -7,25 +7,14 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const bodyParser = require('body-parser');
 const recommenderService = require("../src/service/recommenderService");
-
-const http = require('http');
-const { Server } = require("socket.io");
-
+const io = require("../src/utils/socket/socket")
 const {databaseInit} = require("../src/utils/database/index")
 const connectMongoDB = require("../src/utils/database/mongo");
+const {on} = require("./utils/socket/socket");
 const app = express();
 const port = 3000;
 const UPDATE_RECOMMEND_MINUTE = 30;
 app.use(cors()) // Use this after the variable declaration
-
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*'
-  },
-});
-
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -35,16 +24,8 @@ app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
 }));
 
-io.listen(2999);
-
 // Above our `app.get("/users")` handler
-io.on("connection", (socket) => {
-  console.log(`⚡: ${socket.id} user just connected!`);
 
-  socket.on("disconnect", () => {
-    console.log("🔥: A user disconnected");
-  });
-});
 
 const swaggerDefinition = {
   openapi: '3.0.0',
@@ -89,13 +70,13 @@ const options = {
   apis: ['./src/routes/*.js'],
 };
 
+
 const swaggerSpec = swaggerJSDoc(options);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 databaseInit();
 route(app);
-
 connectMongoDB();
 
 setInterval(() => {
@@ -103,9 +84,15 @@ setInterval(() => {
   recommenderService.resetMatrix();
 }, 1000 * 60);
 
+io.on("connection", (socket) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+  io.emit('message', {message: 'welcome ' + socket.id})
+  socket.on("disconnect", () => {
+    console.log("🔥: A user disconnected");
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is listening at http://localhost:${port}`);
 });
-
-module.exports.io = io;
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const Video = require("../model/Video");
 const Comment = require("../model/Comment");
-
+const io = require("../utils/socket/socket")
 const addComment = async (comment, sender, videoId) => {
   try {
     await Comment.create({
@@ -14,6 +14,22 @@ const addComment = async (comment, sender, videoId) => {
     if (video) {
       video.commentCount++;
       await video.save();
+      console.log('begin emitting'); //
+      try {
+        io.emit('message', {
+          type: 'comment',
+          data: {
+            videoId: videoId,
+            comment: comment,
+            sender: sender
+          }
+        })
+      } catch (e) {
+        console.log(e);
+        console.log('error emitting'); //
+
+      }
+      console.log('end emitting'); //
     }
 
 
