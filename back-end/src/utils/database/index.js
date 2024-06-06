@@ -16,13 +16,17 @@ const initRelation = () => {
     Reaction.belongsTo(Video, { foreignKey: 'video_id' });
     Subscriber.belongsTo(User, { as: 'Publisher', foreignKey: 'publisher_id' });
     Subscriber.belongsTo(User, { as: 'User', foreignKey: 'subscriber_id' });
-    Notification.belongsTo(User, { foreignKey: 'actor' });
-    Notification.belongsTo(User, { foreignKey: 'notifer' });
-    Playlist.belongsTo(User, {foreignKey: 'publisher_id'})
+    Notification.belongsTo(User, { as: 'Actor', foreignKey: 'actor_id' });
+    Notification.belongsTo(User, { as: 'Notifier', foreignKey: 'notifer_id' });
+    Notification.belongsTo(Video, { as: 'Video', foreignKey: 'video_id' });
+
+  Playlist.belongsTo(User, {foreignKey: 'publisher_id'})
     Video.belongsToMany(Playlist, {through: 'PlaylistVideo'});
     Playlist.belongsToMany(Video, {through: 'PlaylistVideo'});
 
     Video.hasMany(Reaction, {foreignKey: 'video_id'});
+    User.hasMany(Video, {foreignKey: 'publisher_id'});
+
 
 }
 

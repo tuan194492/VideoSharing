@@ -5,18 +5,20 @@ const userService = require("../service/userService");
 const videoService = require("../service/videoService");
 const subcriberService = require("../service/subcriberService");
 const io = require("../utils/socket/socket")
+const Video = require("../model/Video");
+const User = require("../model/User");
 
 /*
     Notify template
  *  `ACTOR` has `action` + COMMENT `VIDEO`
- *                       + SUBCRIBE TO CHANNEL       
+ *                       + SUBCRIBE TO CHANNEL
  *                       + POSTED A VIDEO
  *                       + LIKE VIDEO
- * 
+ *
 
  */
 
-/* Params bao gom: 
+/* Params bao gom:
 *    actor_id (ID Người gây ra hành động)
 *    video_id (Đối với TH Comment hoặc like hoặc đăng)
 *    notifier_id (Người nhận thông báo)
@@ -87,16 +89,39 @@ const createNotifyTemplate = async (action, params) => {
 }
 
 const sendNotifies = async (notifierList) => {
-    
+
 }
 
-const getNotificationsByUser = async (userId) => {
+const getNotificationsByUser = async (userId, page, pageSize) => {
     console.log(userId)
+    if (!page) {
+      page = 1
+    }
+    if (!pageSize) {
+      pageSize = 10
+    }
     try {
         const notifications = await Notification.findAll({
             where: {
                 notifer_id: userId
-            }
+            },
+            order: [['createdAt', 'DESC']],
+            include: [
+              {
+                model: User,
+                as: 'Actor',
+                attributes: ["id", "name", "avatar", "shortname", "subscriberCount"],
+                required: true
+              },
+              {
+                model: Video,
+                as: 'Video',
+                attributes: ["id", "title", "description", "views", "createdAt", 'thumbnail'],
+                required: false
+              }
+            ],
+            limit: parseInt(pageSize),
+            offset: (parseInt(page) - 1) * parseInt(pageSize)
         })
         return {
             success: true,
@@ -104,6 +129,7 @@ const getNotificationsByUser = async (userId) => {
             message: "Get notification successful"
         }
     } catch (e) {
+      console.log(e)
         return {
             success: false,
             data: [],
@@ -128,7 +154,7 @@ const readNotification = async (userId, notificationId) => {
                 message: "Some things happen!"
             }
         }
-        
+
     } catch (e) {
         return {
             success: false,
@@ -138,9 +164,63 @@ const readNotification = async (userId, notificationId) => {
     }
 }
 
+const markAsUnreadNotification = async (userId, notificationId) => {
+  try {
+    const notification = await Notification.findByPk(notificationId);
+    if (notification && notification.notifer_id == userId) {
+      notification.status = NOTIFY_STATUS.UN_READ;
+      await notification.save();
+      return {
+        success: true,
+        message: "Mark as unread notification successful"
+      }
+    } else {
+      return {
+        success: false,
+        message: "Some things happen!"
+      }
+    }
+
+  } catch (e) {
+    return {
+      success: false,
+      data: [],
+      message: "No notification"
+    }
+  }
+}
+
+const markAsReadAll = async (userId) => {
+  try {
+    const notifications = await Notification.update(
+      {
+        status: NOTIFY_STATUS.READ
+      },
+      {
+        where: {
+          notifer_id: userId
+        }
+      }
+    )
+    return {
+      success: true,
+      message: "Mark as read notification successful"
+    }
+
+  } catch (e) {
+    return {
+      success: false,
+      data: [],
+      message: "No notification"
+    }
+  }
+}
+
 module.exports = {
     notifyToAllNotifiers,
     createNotifications,
     getNotificationsByUser,
-    readNotification
+    readNotification,
+    markAsUnreadNotification,
+    markAsReadAll
 }

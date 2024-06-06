@@ -5,7 +5,7 @@ const {NOTIFY_ACTION} = require("../constant/enum/ENUM")
 
 const getNotificationList = async (req, res, next) => {
     const user = req.user;
-    const result = await notifyService.getNotificationsByUser(req.user.userId);
+    const result = await notifyService.getNotificationsByUser(req.user.userId, req.query?.page, req.query?.pageSize);
     if (result.success) {
         return res.status(200).json({
             success: true,
@@ -16,7 +16,7 @@ const getNotificationList = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: result.message
-        }) 
+        })
     }
 }
 
@@ -33,8 +33,8 @@ const readNotification = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: result.message
-        }) 
-    }   
+        })
+    }
 }
 
 module.exports = {
