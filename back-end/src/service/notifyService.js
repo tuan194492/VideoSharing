@@ -4,6 +4,7 @@ const {NOTIFY_ACTION, NOTIFY_STATUS} = require("../constant/enum/ENUM")
 const userService = require("../service/userService");
 const videoService = require("../service/videoService");
 const subcriberService = require("../service/subcriberService");
+const io = require("../utils/socket/socket")
 
 /*
     Notify template
@@ -29,13 +30,16 @@ const createNotifications = async (params, action) => {
     try {
         for (let notifier of notifierList) {
             console.log("Notifier id", notifier);
-            Notification.create({
+            const notificationData = {
                 actor_id: actorId,
                 notifer_id: notifier,
                 video_id: videoId,
                 status: NOTIFY_STATUS.UN_READ,
                 type: action
-            })
+            }
+            Notification.create(notificationData)
+            console.log(`user${notifier}`)
+            io.emit(`user${notifier}`, notificationData);
         }
     } catch (e) {
         console.log(e);
