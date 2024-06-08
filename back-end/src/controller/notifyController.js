@@ -37,7 +37,60 @@ const readNotification = async (req, res, next) => {
     }
 }
 
+const unreadNotification = async (req, res, next) => {
+  const notificationId = req.params.id;
+  const result = await notifyService.markAsUnreadNotification(req.user.userId, notificationId);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: "Unread notifications successful",
+      data: result.data
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    })
+  }
+}
+
+const readAllNotifications = async (req, res, next) => {
+  const result = await notifyService.markAsReadAll(req.user.userId);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: "Read all notifications successful",
+      data: result.data
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message
+    })
+  }
+}
+
+const hasUnreadNotifications = async (req, res, next) => {
+  const result = await notifyService.hasUnreadNotifications(req.user.userId);
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      message: "Has unread notifications",
+      hasUnread: result.hasUnread
+    });
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+      hasUnread: false
+    })
+  }
+}
+
 module.exports = {
     getNotificationList,
-    readNotification
+    readNotification,
+    hasUnreadNotifications,
+    unreadNotification,
+    readAllNotifications
 }

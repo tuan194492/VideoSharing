@@ -84,7 +84,7 @@ const getListOfSubcribersByChannelId = async (channelId) => {
         include: [
           {
             model: User,
-            as: 'User',
+            as: 'user',
             attributes: ["id", "name", "avatar", "shortname", "subscriberCount"],
             required: true
           }

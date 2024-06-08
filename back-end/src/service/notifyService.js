@@ -216,11 +216,29 @@ const markAsReadAll = async (userId) => {
   }
 }
 
+const hasUnreadNotifications = async (userId) => {
+  try {
+    const notifications = await Notification.findAll({
+      where: {
+        notifer_id: userId,
+        status: NOTIFY_STATUS.UN_READ
+      }
+    })
+    return {
+      success: true,
+      hasUnread: notifications.length > 0
+    }
+  } catch (e) {
+    return false
+  }
+}
+
 module.exports = {
     notifyToAllNotifiers,
     createNotifications,
     getNotificationsByUser,
     readNotification,
     markAsUnreadNotification,
-    markAsReadAll
+    markAsReadAll,
+    hasUnreadNotifications
 }
