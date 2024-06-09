@@ -25,14 +25,14 @@ const login = async (req, res, next) => {
             }
         }
         // User does exist, send token to client
-        const token = jwt.sign({ userId: user.id, name: user.name}, jwtSecret, {
+        const token = jwt.sign({ userId: user.id, name: user.name, role: user.name === 'admin' ? 'admin' : 'user'}, jwtSecret, {
             expiresIn: "365d",
           });
         return res.json({
             token: token,
             user: user,
+            role: user.name === 'admin' ? 'admin' : 'user',
             message: "Login successful",
-            role: 'user'
         });
 
     })
