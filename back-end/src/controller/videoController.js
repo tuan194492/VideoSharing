@@ -9,6 +9,7 @@ const notifyService = require("../service/notifyService");
 const loggingService = require("../service/loggingService");
 const recommenderService = require("../service/recommenderService");
 const { NOTIFY_ACTION, USER_ACTION, VIDEO_STATUS } = require("../constant/enum/ENUM");
+const Video = require("../model/Video") ;
 const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
 const getVideoDataById = async (req, res, next) => {};
@@ -386,6 +387,35 @@ const streamMultipleResolutionsVideo = async (req, res, next) => {
   }
 }
 
+const addWatchVideoEvent = async (req, res, next) => {
+    const videoId = req.params.id;
+    const userId = req?.user?.userId;
+    const watchTime = req.body?.watchTime || 0;
+    const MIN_WATCH_TIME = 5;
+    if (watchTime < MIN_WATCH_TIME) {
+      return res.status(200).json({
+        success: true,
+        message: `Watch time must be greater than ${MIN_WATCH_TIME} seconds`
+      })
+    }
+    const video = await Video.findByPk(videoId);
+    if (video) {
+      if (watchTime >= VIEW_COUNT_PERCENT) {
+        videoService.addViewForVideo(videoId);
+      }
+      loggingService.createLog({
+        userId: req.query?.userId,
+        action: USER_ACTION.WATCH,
+        videoId: videoId,
+        watchTime: watchTime
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: 'Add watch video event successful'
+    })
+
+}
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -400,5 +430,6 @@ module.exports = {
   getLikedVideoByUser,
 	getWatchedVideoByUserId,
   deleteWatchedVideoByUserId,
-  streamMultipleResolutionsVideo
+  streamMultipleResolutionsVideo,
+  addWatchVideoEvent
 };

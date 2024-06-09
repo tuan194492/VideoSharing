@@ -1,6 +1,7 @@
 const { Log } = require("../model/Log");
 const Subscriber = require("../model/Subcriber");
 const Video = require("../model/Video");
+const User = require("../model/User");
 
 const sequelize = require("../utils/database/sequelize")
 const {USER_ACTION} = require("../constant/enum/ENUM");
@@ -127,7 +128,7 @@ const getSubscriberCountByChannel =  async (channelId, startDate, endDate) => {
 }
 
 const mostWatchedVideoByDate = async (channelId, numberOfVideo, endDate, dayAgo) => {
-    const defaultDayAgo = 7;
+    const defaultDayAgo = 28;
     if (!numberOfVideo) {
       numberOfVideo = 5;
     }
@@ -166,6 +167,7 @@ const mostWatchedVideoByDate = async (channelId, numberOfVideo, endDate, dayAgo)
           videoId: log._id,
           viewCount: log.viewCount,
           title: video.title,
+          video_length_in_seconds: video.video_length_in_seconds,
           thumbnail: video.thumbnail,
           createdAt: video.createdAt
         });
@@ -177,9 +179,68 @@ const mostWatchedVideoByDate = async (channelId, numberOfVideo, endDate, dayAgo)
     }
 }
 
+/*
+  Get analytics data of a channel
+  Data to get:
+    1. View count from started to end date
+    2. Current Subscribers
+    3. Watching time from state date to end date
+ */
+const getChannelAnalyticsData = async (channelId, startDate, endDate) => {
+  const defaultDayAgo = 7;
+
+  if (!endDate) {
+    endDate = new Date();
+    console.log(endDate)
+  }
+  startDate = new Date(endDate.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
+  const viewCount = await Log.countDocuments({
+    channelId: parseInt(channelId),
+    action: "WATCH",
+    createdAt: {$gte: startDate, $lte: endDate}
+  });
+  const watchTimeResult = await Log.aggregate([
+    {
+      $match: {
+        channelId: parseInt(channelId),
+        action: "WATCH",
+        createdAt: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalWatchTime: {$sum: "$watchTime"}
+      }
+    }
+  ]);
+
+  console.log(`Watch time result ` + watchTimeResult)
+
+  const user = await User.findByPk(channelId);
+  let subscriberCount = 0;
+  if (user) {
+    subscriberCount = user.subscriberCount;
+  }
+
+  const totalWatchTime = watchTimeResult[0] ? watchTimeResult[0].totalWatchTime : 0;
+  return {
+    success: true,
+    data: {
+      viewCount,
+      totalWatchTime,
+      subscriberCount
+    }
+  }
+}
+
 
 module.exports  = {
   getViewCountByChannel,
   getSubscriberCountByChannel,
-  mostWatchedVideoByDate
+  mostWatchedVideoByDate,
+  getChannelAnalyticsData
 }

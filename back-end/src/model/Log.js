@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const LogSchema = new mongoose.Schema({
   userId: {
     type: Number,
-    required: true,
+    required: false,
   },
   action: {
     type: String,
@@ -16,6 +16,10 @@ const LogSchema = new mongoose.Schema({
   channelId: {
     type: Number,
     required: true,
+  },
+  watchTime: {
+    type: Number,
+    required: false,
   }
 
 }, {

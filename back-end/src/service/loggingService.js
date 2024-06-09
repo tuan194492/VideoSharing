@@ -13,46 +13,62 @@ const Video = require("../model/Video");
 */
 const createLog = async (params) => {
   const video = await Video.findByPk(params.videoId);
-  const log = new Log({
-		userId: params.userId,
-		action: params.action,
-		videoId: params.videoId,
-    channelId: video.publisher_id
-	});
+  if (params.watchTime) {
+    const log = new Log({
+      userId: params.userId,
+      action: params.action,
+      videoId: params.videoId,
+      channelId: video.publisher_id,
+      watchTime: params.watchTime,
+    });
 
-	log.save();
+    log.save();
+  } else {
+    const log = new Log({
+      userId: params.userId,
+      action: params.action,
+      videoId: params.videoId,
+      channelId: video.publisher_id,
+    });
+
+    log.save();
+  }
+
 	// Change react point
-	const recommendPoint = await RecommendPoints.findOne({
-		userId: params.userId,
-		videoId: params.videoId,
-	}).exec();
-	if (!recommendPoint) {
-		const data = new RecommendPoints({
-			userId: params.userId,
-			point: getUserActionPoint(params.action),
-			videoId: params.videoId,
-		});
-		data.save();
-	} else {
-		recommendPoint.point = recommendPoint.point + getUserActionPoint(params.action);
-		recommendPoint.save();
-	}
-	// Log for watched video
-	const watchedVideo = await WatchedVideo.findOne({
-		userId: params.userId,
-		videoId: params.videoId,
-	}).exec();
-	if (!watchedVideo) {
-		const data = new WatchedVideo({
-			userId: params.userId,
-			timeWatched: 1,
-			videoId: params.videoId,
-		});
-		data.save();
-	} else {
-		watchedVideo.timeWatched = watchedVideo.timeWatched + 1;
-		watchedVideo.save();
-	}
+  if (params.userId) {
+    const recommendPoint = await RecommendPoints.findOne({
+      userId: params.userId,
+      videoId: params.videoId,
+    }).exec();
+    if (!recommendPoint) {
+      const data = new RecommendPoints({
+        userId: params.userId,
+        point: getUserActionPoint(params.action),
+        videoId: params.videoId,
+      });
+      data.save();
+    } else {
+      recommendPoint.point = recommendPoint.point + getUserActionPoint(params.action);
+      recommendPoint.save();
+    }
+    const watchedVideo = await WatchedVideo.findOne({
+      userId: params.userId,
+      videoId: params.videoId,
+    }).exec();
+    if (!watchedVideo) {
+      const data = new WatchedVideo({
+        userId: params.userId,
+        timeWatched: 1,
+        videoId: params.videoId,
+      });
+      data.save();
+    } else {
+      watchedVideo.timeWatched = watchedVideo.timeWatched + 1;
+      watchedVideo.save();
+    }
+  }
+
+
 };
 
 const getUserActionPoint = (action) => {

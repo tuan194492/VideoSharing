@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const WatchedVideoSchema = new mongoose.Schema({
   userId: {
     type: Number,
-    required: true,
+    required: false,
   },
   videoId: {
     type: Number,
