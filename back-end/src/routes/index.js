@@ -7,6 +7,7 @@ const notifyRoute = require("./notifyRoutes");
 const reactionRoute = require("./reactionRoute");
 const channelRoute = require("./channelRoute");
 const playlistRoute = require("./playlistRoute");
+const reportRoute = require("./reportRoute");
 
 const route = (app) => {
     app.use("/api/auth", authRoute);
@@ -17,6 +18,8 @@ const route = (app) => {
     app.use("/api/react", reactionRoute);
     app.use("/api/channel", channelRoute);
     app.use("/api/playlist", playlistRoute);
+    app.use("/api/report", reportRoute);
+
 };
 
 module.exports = route;

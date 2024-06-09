@@ -237,10 +237,27 @@ const getChannelAnalyticsData = async (channelId, startDate, endDate) => {
   }
 }
 
+const deleteWatchedVideo = async (logId) => {
+  try {
+    await Log.findOneAndDelete(logId, { lean: true}).exec();
+    return {
+      success: true,
+      message: "Delete watched video successful"
+    }
+  } catch (err) {
+    console.log(err)
+    return {
+      success: false,
+      message: "Delete watched video failed"
+    }
+  }
+}
+
 
 module.exports  = {
   getViewCountByChannel,
   getSubscriberCountByChannel,
   mostWatchedVideoByDate,
-  getChannelAnalyticsData
+  getChannelAnalyticsData,
+  deleteWatchedVideo
 }

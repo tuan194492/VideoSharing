@@ -25,7 +25,7 @@ const login = async (req, res, next) => {
             }
         }
         // User does exist, send token to client
-        const token = jwt.sign({ userId: user.id}, jwtSecret, {
+        const token = jwt.sign({ userId: user.id, name: user.name}, jwtSecret, {
             expiresIn: "365d",
           });
         return res.json({

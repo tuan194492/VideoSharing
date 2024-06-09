@@ -7,6 +7,7 @@ const Subscriber = require("../../model/Subcriber");
 const Notification = require("../../model/Notification");
 const Playlist = require("../../model/Playlist");
 const PlaylistVideo = require("../../model/PlaylistVideo");
+const Report = require("../../model/Report");
 
 const initRelation = () => {
     Video.belongsTo(User, { foreignKey: 'publisher_id' });
@@ -17,9 +18,9 @@ const initRelation = () => {
     Subscriber.belongsTo(User, { as: 'Publisher', foreignKey: 'publisher_id' });
     Subscriber.belongsTo(User, { as: 'user', foreignKey: 'subscriber_id' });
     Notification.belongsTo(User, { as: 'Actor', foreignKey: 'actor_id' });
-    Notification.belongsTo(User, { as: 'Notifier', foreignKey: 'notifer_id' });
+    Notification.belongsTo(User, { as: 'Notifier', foreignKey: 'notifer_id'});
     Notification.belongsTo(Video, { as: 'Video', foreignKey: 'video_id' });
-
+    Report.belongsTo(User, { as: 'Reporter', foreignKey:'reporter_id' });
     Playlist.belongsTo(User, {foreignKey: 'publisher_id'})
     Video.belongsToMany(Playlist, {through: 'PlaylistVideo'});
     Playlist.belongsToMany(Video, {through: 'PlaylistVideo'});

@@ -404,7 +404,7 @@ const addWatchVideoEvent = async (req, res, next) => {
         videoService.addViewForVideo(videoId);
       }
       loggingService.createLog({
-        userId: req.query?.userId,
+        userId: userId,
         action: USER_ACTION.WATCH,
         videoId: videoId,
         watchTime: watchTime

@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
     if (token == null) {
       return res.sendStatus(401);
     }
-  
+
     jwt.verify(token, jwtSecret, (err, user) => {
       console.log(err)
       if (err) {
@@ -22,6 +22,32 @@ const authenticateToken = (req, res, next) => {
       console.log("USER from token", req.user);
       next();
     });
+};
+
+const authenticateAdmin = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  console.log(token)
+  if (token == null) {
+    return res.sendStatus(401);
+  }
+
+  jwt.verify(token, jwtSecret, (err, user) => {
+    console.log(err)
+    if (err) {
+      return res.status(403).json({message: 'Token expired. Please login again'});
+    }
+    req.user = user;
+    console.log("USER from token", req.user);
+    if (user.name !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admin can access this api'
+      })
+    }
+    console.log("USER from token", req.user);
+    next();
+  });
 };
 
 const getUserToken = (req, res, next) => {
@@ -36,5 +62,6 @@ const getUserToken = (req, res, next) => {
 
 module.exports = {
     authenticateToken,
-    getUserToken
+    getUserToken,
+    authenticateAdmin
 }

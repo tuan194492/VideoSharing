@@ -40,11 +40,25 @@ const REACTION_TYPE = {
     DISLIKE: 'D'
 }
 
+const REPORT_STATUS = {
+  APPROVED: 'A',
+  PENDING: 'P',
+  REJECTED: 'R'
+}
+
+const REPORT_TYPE = {
+  VIDEO: 'V',
+  USER: 'U',
+  COMMENT: 'C'
+}
+
 module.exports = {
     VIDEO_STATUS,
     NOTIFY_ACTION,
     NOTIFY_STATUS,
     REACTION_TYPE,
     USER_ACTION,
-    USER_ACTION_POINT
+    USER_ACTION_POINT,
+    REPORT_STATUS,
+    REPORT_TYPE
 }
