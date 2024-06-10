@@ -10,15 +10,23 @@ const Sequelize = require("sequelize");
 const getViewCountByChannel =  async (channelId, startDate, endDate) => {
   console.log(channelId)
   const defaultDayAgo = 7;
+  console.log(startDate, endDate)
+
   if (!endDate) {
     endDate = new Date();
     console.log(endDate)
+  } else {
+    endDate = new Date(endDate);
   }
   if (!startDate) {
     const date = new Date();
     startDate = new Date(date.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
     console.log(startDate)
+  } else {
+    startDate = new Date(startDate);
   }
+  console.log(startDate, endDate)
+
   const logs = await Log.aggregate([
     { $match:
         {
@@ -43,7 +51,7 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
   // Check for start date
   const startStr = startDate.toISOString().split('T')[0];
   if (!logMap.has(startStr)) {
-    result.push({
+    result.unshift({
       _id: startStr,
       viewCount: logMap.get(startStr) || 0
     });
@@ -188,12 +196,17 @@ const mostWatchedVideoByDate = async (channelId, numberOfVideo, endDate, dayAgo)
  */
 const getChannelAnalyticsData = async (channelId, startDate, endDate) => {
   const defaultDayAgo = 7;
+  console.log(startDate, endDate)
 
   if (!endDate) {
     endDate = new Date();
     console.log(endDate)
   }
-  startDate = new Date(endDate.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
+  if (!startDate ) {
+    startDate = new Date(endDate.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
+  }
+
+  console.log(startDate, endDate)
   const viewCount = await Log.countDocuments({
     channelId: parseInt(channelId),
     action: "WATCH",

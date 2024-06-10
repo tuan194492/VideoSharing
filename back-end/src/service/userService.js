@@ -2,6 +2,9 @@ const express = require("express");
 const User = require("../model/User");
 const bcrypt = require("bcrypt");
 const playlistService = require("../service/playlistService");
+const {USER_STATUS} = require("../constant/enum/ENUM");
+const {Sequelize} = require("sequelize");
+const {sequelize} = require("../utils/database");
 const validateNewUser = async (newUser) => {
   const { email } = newUser;
   const user = await User.findOne({
@@ -26,7 +29,7 @@ const createNewUser = async (user) => {
   const res = await validateNewUser(user);
   const hashedPassword = await bcrypt.hash(user.password, 10);
   if (res.success) {
-    const result = await User.create({ ...user, password: hashedPassword });
+    const result = await User.create({ ...user, password: hashedPassword, status: USER_STATUS.ACTIVE });
     console.log(result)
     await playlistService.createDefaultPlaylistForUser(result.dataValues);
     return {
@@ -89,9 +92,44 @@ const updateUser = async (userData) => {
   }
 }
 
+const getAllUsers = async () => {
+  try {
+    const users = await User.findAll({
+      where:{
+        id: {
+          [Sequelize.Op.gt]: 0 // Users with more than 100 subscribers
+        },
+        email: {
+          [Sequelize.Op.ne]: 'admin@gmail.com'
+        }
+      }
+    });
+    return { success: true, data: users };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: error.message };
+  }
+};
+
+const updateUserStatus = async (userId, status) => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return { success: false, message: 'User not found' };
+    }
+    user.status = status;
+    await user.save();
+    return { success: true, message: `User ${status === 'A' ? 'activated' : 'suspended'} successfully` };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
 module.exports = {
   validateNewUser,
   createNewUser,
   getUserById,
-  updateUser
+  updateUser,
+  getAllUsers,
+  updateUserStatus
 };

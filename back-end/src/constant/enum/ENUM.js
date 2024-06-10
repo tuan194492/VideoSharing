@@ -6,6 +6,11 @@ const VIDEO_STATUS = {
     DELETED: 'DELETED'
 }
 
+const USER_STATUS = {
+  ACTIVE: 'A',
+  SUSPEND: 'S'
+}
+
 const USER_ACTION = {
     WATCH: 'WATCH',
     LIKE: 'LIKE',
@@ -60,5 +65,6 @@ module.exports = {
     USER_ACTION,
     USER_ACTION_POINT,
     REPORT_STATUS,
-    REPORT_TYPE
+    REPORT_TYPE,
+    USER_STATUS
 }

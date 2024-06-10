@@ -17,7 +17,7 @@ const findChannelById = async (req, res, next) => {
 }
 
 const getChannelViewAnalyst = async (req, res, next) => {
-  const result = await channelService.getViewCountByChannel(req.params.channelId);
+  const result = await channelService.getViewCountByChannel(req.params.channelId, req.query?.startDate, req.query?.endDate);
   if (result.success) {
     return res.status(200).json({
       success: true,
@@ -65,6 +65,7 @@ const getMostWatchedVideos = async (req, res, next) => {
 }
 
 const getChannelAnalytics = async (req, res, next) => {
+  console.log('Query' + req.query)
   const result = await channelService.getChannelAnalyticsData(req.params.channelId);
   if (result.success) {
     return res.status(200).json({
@@ -97,11 +98,14 @@ const deleteWatchedVideo = async (req, res, next) => {
   }
 }
 
+
+
+
 module.exports = {
   findChannelById,
   getChannelViewAnalyst,
   getChannelSubscriberAnalyst,
   getMostWatchedVideos,
   getChannelAnalytics,
-  deleteWatchedVideo
+  deleteWatchedVideo,
 }

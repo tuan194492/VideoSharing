@@ -1,6 +1,10 @@
 const express = require("express");
 const Report = require("../model/Report");
-const {REPORT_STATUS} = require("../constant/enum/ENUM");
+const {REPORT_STATUS, VIDEO_STATUS} = require("../constant/enum/ENUM");
+const User = require("../model/User");
+const Video = require("../model/Video");
+const Comment = require("../model/Comment");
+const commentService = require("./commentService");
 
 const createReport = async (type, videoId, commentId, channelId, reporterId, description) => {
   try {
@@ -80,7 +84,7 @@ const approveReport = async (reportId, approve_remark) => {
   try {
     const report = await Report.findByPk(reportId);
     if (report) {
-      if (!report.status !== REPORT_STATUS.PENDING) {
+      if (report.status !== REPORT_STATUS.PENDING) {
           return {
             success: false,
             message: "Report has been approved or rejected",
@@ -89,6 +93,28 @@ const approveReport = async (reportId, approve_remark) => {
       report.status = REPORT_STATUS.APPROVED;
       report.approve_remark = approve_remark;
       await report.save();
+      switch (report.type) {
+        case "video":
+          const video = await Video.findByPk(report.video_id);
+          if (video) {
+            video.status = VIDEO_STATUS.DELETED;
+            await video.save();
+          }
+          break;
+        case "comment":
+          const comment = await Comment.findByPk(report.comment_id);
+          if (comment) {
+            await commentService.deleteComment(report.comment_id);
+          }
+          break;
+        case "channel":
+          const channel = await User.findByPk(report.channel_id);
+          if (channel) {
+            channel.status = VIDEO_STATUS.DELETED;
+            await channel.save();
+          }
+          break;
+      }
       return {
         success: true,
         message: "Report approved successfully",
@@ -143,7 +169,33 @@ const getAllReportsForAdmin = async (page, pageSize) => {
     const result = await Report.findAndCountAll({
       limit: pageSize,
       offset: (page - 1) * pageSize,
-    });
+      include: [
+        {
+          model: User,
+          as: "Reporter",
+          attributes: ["id", "name", "email"],
+          required: false
+        },
+        {
+          model: Video,
+          as: "Video",
+          attributes: ["id", "title"],
+          required: false
+        },
+        {
+          model: Comment,
+          as: "Comment",
+          attributes: ["id", "value"],
+          required: false
+        },
+        {
+          model: User,
+          as: "Channel",
+          attributes: ["id", "name"],
+          required: false
+        },
+        ],
+      });
     return {
       success: true,
       message: "Get all reports successful",

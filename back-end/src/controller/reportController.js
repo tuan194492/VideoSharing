@@ -1,6 +1,7 @@
 const express = require("express");
 const reportService = require("../service/reportService");
 const {ENUM} = require("sequelize");
+const {REPORT_TYPE} = require("../constant/enum/ENUM");
 
 const createReport = async (req, res, next) => {
   let { type, videoId, commentId, channelId, description } = req.body;
@@ -89,7 +90,6 @@ const getAllReportsForAdmin = async (req, res, next) => {
   const pageSize = parseInt(req.query?.pageSize) || 10;
 
   const result = await reportService.getAllReportsForAdmin(page, pageSize);
-
   if (result.success) {
     return res.status(200).json({
       success: true,

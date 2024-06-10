@@ -17,10 +17,15 @@ const initRelation = () => {
     Reaction.belongsTo(Video, { foreignKey: 'video_id' });
     Subscriber.belongsTo(User, { as: 'Publisher', foreignKey: 'publisher_id' });
     Subscriber.belongsTo(User, { as: 'user', foreignKey: 'subscriber_id' });
-    Notification.belongsTo(User, { as: 'Actor', foreignKey: 'actor_id' });
-    Notification.belongsTo(User, { as: 'Notifier', foreignKey: 'notifer_id'});
-    Notification.belongsTo(Video, { as: 'Video', foreignKey: 'video_id' });
-    Report.belongsTo(User, { as: 'Reporter', foreignKey:'reporter_id' });
+    Report.belongsTo(User, { as: 'Reporter', foreignKey:'reporter_id', onUpdate: 'NO ACTION' });
+    Report.belongsTo(Video, { as: 'Video', foreignKey:'video_id', onUpdate: 'NO ACTION' });
+    Report.belongsTo(Comment, { as: 'Comment', foreignKey:'comment_id', onUpdate: 'NO ACTION' });
+    Report.belongsTo(User, { as: 'Channel', foreignKey:'channel_id', onUpdate: 'NO ACTION' });
+    Notification.belongsTo(User, { as: 'Actor', foreignKey: 'actor_id', onUpdate: 'NO ACTION' });
+    Notification.belongsTo(User, { as: 'Notifier', foreignKey: 'notifer_id', onUpdate: 'NO ACTION'});
+    Notification.belongsTo(Video, { as: 'Video', foreignKey: 'video_id', onUpdate: 'NO ACTION' });
+
+
     Playlist.belongsTo(User, {foreignKey: 'publisher_id'})
     Video.belongsToMany(Playlist, {through: 'PlaylistVideo'});
     Playlist.belongsToMany(Video, {through: 'PlaylistVideo'});

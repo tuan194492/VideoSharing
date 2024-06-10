@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const dotenv = require("dotenv");
 const userService = require("../service/userService");
+const {USER_STATUS} = require("../constant/enum/ENUM");
 dotenv.config();
 // Access the JWT secret as an environment variable
 const jwtSecret = process.env.JWT_SECRET;
@@ -22,6 +23,9 @@ const login = async (req, res, next) => {
         } else {
             if (!(await bcrypt.compare(password, user.password))) {
                 return res.status(401).json({ error: "Password is not correct." });
+            }
+            if (user.status === USER_STATUS.SUSPEND) {
+              return res.status(401).json({ error: "User is suspended." });
             }
         }
         // User does exist, send token to client
@@ -85,8 +89,37 @@ const update = async (req, res, next) => {
     })
 }
 
+const getAllUsers = async (req, res) => {
+  const result = await userService.getAllUsers();
+  if (result.success) {
+    return res.status(200).json(result.data);
+  }
+  return res.status(500).json({ message: result.message });
+};
+
+const activateUser = async (req, res) => {
+  const userId = req.params.userId;
+  const result = await userService.updateUserStatus(userId, 'A');
+  if (result.success) {
+    return res.status(200).json({ message: result.message });
+  }
+  return res.status(500).json({ message: result.message });
+};
+
+const suspendUser = async (req, res) => {
+  const userId = req.params.userId;
+  const result = await userService.updateUserStatus(userId, 'S');
+  if (result.success) {
+    return res.status(200).json({ message: result.message });
+  }
+  return res.status(500).json({ message: result.message });
+};
+
 module.exports = {
     login,
     register,
-    update
+    update,
+    getAllUsers,
+    activateUser,
+    suspendUser,
 }

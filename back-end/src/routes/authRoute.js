@@ -66,5 +66,7 @@ const authMiddleware = require("../middlleware/authMiddleware");
 router.post('/login', authController.login);
 router.post('/register', authController.register);
 router.post('/update', authMiddleware.authenticateToken  , authController.update);
-
+router.get('/all-user', authMiddleware.authenticateAdmin, authController.getAllUsers);
+router.post('/:userId/activate', authMiddleware.authenticateAdmin, authController.activateUser);
+router.post('/:userId/suspend', authMiddleware.authenticateAdmin, authController.suspendUser);
 module.exports = router;
