@@ -74,6 +74,7 @@ const getViewerVideoList = async (data) => {
 			},
 			limit: pageSize,
 			offset: (page - 1) * pageSize,
+      include: [User]
 		});
 		return {
 			success: true,
@@ -100,6 +101,7 @@ const getVideoByPublisherId = async (data) => {
 				},
 				limit: pageSize,
 				offset: page - 1,
+        include: [User]
 			});
 			return {
 				success: true,
