@@ -94,6 +94,7 @@ const deleteComment = async (commentId) => {
       message: "Delete comment successful",
     };
   } catch (e) {
+    console.log(e);
     return {
       success: false,
       message: e,

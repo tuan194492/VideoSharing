@@ -52,7 +52,7 @@ const getReportsByUser = async (req, res, next) => {
 const approveReport = async (req, res, next) => {
   const reportId = req.params.reportId;
 
-  const result = await reportService.approveReport(reportId);
+  const result = await reportService.approveReport(reportId, req.body.reportRemark);
 
   if (result.success) {
     return res.status(200).json({
@@ -70,7 +70,7 @@ const approveReport = async (req, res, next) => {
 const rejectReport = async (req, res, next) => {
   const reportId = req.params.reportId;
 
-  const result = await reportService.rejectReport(reportId);
+  const result = await reportService.rejectReport(reportId, req.body.reportRemark);
 
   if (result.success) {
     return res.status(200).json({

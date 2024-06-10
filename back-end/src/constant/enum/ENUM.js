@@ -57,6 +57,11 @@ const REPORT_TYPE = {
   COMMENT: 'C'
 }
 
+const COMMENT_STATUS = {
+  ACTIVE: 'A',
+  DELETED: 'D'
+}
+
 module.exports = {
     VIDEO_STATUS,
     NOTIFY_ACTION,
@@ -66,5 +71,6 @@ module.exports = {
     USER_ACTION_POINT,
     REPORT_STATUS,
     REPORT_TYPE,
-    USER_STATUS
+    USER_STATUS,
+    COMMENT_STATUS
 }
