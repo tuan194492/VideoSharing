@@ -75,16 +75,24 @@ const getViewCountByChannel =  async (channelId, startDate, endDate) => {
 }
 
 const getSubscriberCountByChannel =  async (channelId, startDate, endDate) => {
+  console.log(channelId)
   const defaultDayAgo = 7;
+  console.log(startDate, endDate)
+
   if (!endDate) {
     endDate = new Date();
     console.log(endDate)
+  } else {
+    endDate = new Date(endDate);
   }
   if (!startDate) {
     const date = new Date();
     startDate = new Date(date.getTime() - defaultDayAgo * 24 * 60 * 60 * 1000);
     console.log(startDate)
+  } else {
+    startDate = new Date(startDate);
   }
+  console.log(startDate, endDate)
 
 
    // Replace with the actual publisher_id you want to filter
@@ -114,7 +122,7 @@ const getSubscriberCountByChannel =  async (channelId, startDate, endDate) => {
 // Check for start date
   const startStr = startDate.toISOString().split('T')[0];
   if (!logMap.has(startStr)) {
-    result.push({
+    result.unshift({
       date: startStr,
       subscriberCount: logMap.get(startStr) || 0
     });

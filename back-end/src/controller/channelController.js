@@ -33,7 +33,7 @@ const getChannelViewAnalyst = async (req, res, next) => {
 }
 
 const getChannelSubscriberAnalyst = async (req, res, next) => {
-  const result = await channelService.getSubscriberCountByChannel(req.params.channelId);
+  const result = await channelService.getSubscriberCountByChannel(req.params.channelId, req.query?.startDate, req.query?.endDate);
   if (result.success) {
     return res.status(200).json({
       success: true,

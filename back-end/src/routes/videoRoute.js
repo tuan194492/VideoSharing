@@ -33,6 +33,7 @@ router.get('/watch', videoController.getViewerVideoList);
 router.get('/watched-video', authMiddleware.getUserToken, videoController.getWatchedVideoByUserId);
 router.post('/watch-video/:id', authMiddleware.getUserToken, videoController.addWatchVideoEvent);
 
+router.get('/trending-video', videoController.getTrendingVideos);
 router.delete('/watched-video', authMiddleware.authenticateToken, videoController.deleteWatchedVideoByUserId);
 router.get('/get-by-publisher/:publisherId', authMiddleware.getUserToken, videoController.getVideoByPublisherId);
 router.get('/liked-video', authMiddleware.getUserToken, videoController.getLikedVideoByUser);
