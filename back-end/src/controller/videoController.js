@@ -12,6 +12,8 @@ const { NOTIFY_ACTION, USER_ACTION, VIDEO_STATUS } = require("../constant/enum/E
 const Video = require("../model/Video") ;
 const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
+const recommenderServiceV2 = require("../service/biGraphRecommenderService");
+
 const getVideoDataById = async (req, res, next) => {};
 
 const createVideo = async (req, res, next) => {
@@ -435,6 +437,16 @@ const getTrendingVideos = async function (req, res, next) {
   }
 
 }
+
+const getRecommendVideo = async (req, res, next) => {
+  const result = await recommenderServiceV2.getRecommendedVideosList(req.query?.userId);
+  console.log(result)
+  console.log(result)
+  res.status(200).json({
+    message: 'Recommend video',
+    data: result
+  });
+}
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -451,5 +463,6 @@ module.exports = {
   deleteWatchedVideoByUserId,
   streamMultipleResolutionsVideo,
   addWatchVideoEvent,
-  getTrendingVideos
+  getTrendingVideos,
+  getRecommendVideo
 };
