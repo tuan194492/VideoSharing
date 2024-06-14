@@ -2,7 +2,7 @@ const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
 const videoService = require("./videoService");
-const colllectionUtils = require("../utils/CollectionUtils");
+const collectionUtils = require("../utils/CollectionUtils");
 let suggestionPointsMatrix = [];
 let baseReactionPointsMatrix = [];
 let pathWithWeightBetweenUsersMatrix = [];
@@ -85,7 +85,7 @@ const buildBaseReactionPointsMatrix = async () => {
         console.log("==============baseReactionPointsMatrix===============");
       baseReactionPointsMatrix = normalizeMatrix(baseReactionPointsMatrix);
       console.log("=============baseReactionPointsMatrix================");
-      console.table(baseReactionPointsMatrix);
+      console.table(convertElementsToFixedWidth(baseReactionPointsMatrix));
       console.log("==============baseReactionPointsMatrix===============");
     }
 }
@@ -104,7 +104,11 @@ const buildSimilarityMatrix = (pointMatrix) => {
     for (let i = 0; i < numberOfUsers; i++) {
         const row = [];
         for (let j = 0; j < numberOfUsers; j++) {
+          if (i === j) {
+            row.push(1);
+          } else {
             row.push(similarityPoint(i, j, 0, pointMatrix, maxPoint));
+          }
         }
         similarityMatrix.push(row);
     }
@@ -151,12 +155,15 @@ const getRecommendedVideosList = async (userId, page, pageSize) => {
     if (!suggestionPointsMatrix || suggestionPointsMatrix.length === 0) {
       await initMatrix();
     }
-    const userIndex = users.indexOf(parseInt(userId));
+    let userIndex = users.indexOf(parseInt(userId));
+    if (userIndex < 0) {
+      return [];
+    }
     const result = suggestionPointsMatrix[userIndex].map((value, index) => ({
         videoId: videos[index],
         point: value,
     })).sort((a, b) => b.point - a.point);
-    return colllectionUtils.paginate(result, page, pageSize);
+    return collectionUtils.paginate(result, page, pageSize);
 }
 
 const resetMatrix = () => {

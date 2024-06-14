@@ -7,6 +7,8 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJSDoc = require('swagger-jsdoc');
 const bodyParser = require('body-parser');
 const recommenderService = require("../src/service/recommenderService");
+const recommenderServiceV2 = require("../src/service/biGraphRecommenderService");
+
 const io = require("../src/utils/socket/socket")
 const {databaseInit} = require("../src/utils/database/index")
 const connectMongoDB = require("../src/utils/database/mongo");
@@ -80,8 +82,8 @@ route(app);
 connectMongoDB();
 
 setInterval(() => {
-  console.info("Reseting utility matrix");
   recommenderService.resetMatrix();
+  recommenderServiceV2.resetMatrix();
 }, 1000 * 60);
 
 io.on("connection", (socket) => {

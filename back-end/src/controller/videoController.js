@@ -440,8 +440,6 @@ const getTrendingVideos = async function (req, res, next) {
 
 const getRecommendVideo = async (req, res, next) => {
   const result = await recommenderServiceV2.getRecommendedVideosList(req.query?.userId);
-  console.log(result)
-  console.log(result)
   res.status(200).json({
     message: 'Recommend video',
     data: result
