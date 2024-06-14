@@ -36,8 +36,16 @@ const getPlaylistById = async (user, playlistId) => {
   if (!authorizeResult.success) {
     return authorizeResult;
   }
+  console.log(playlistId)
   const playlist = await Playlist.findByPk(playlistId, {
-    include: [Video, User],
+    include: [{
+      model: Video,
+      where: {
+        status: VIDEO_STATUS.PUBLIC
+      },
+      required: false,
+      order: [['createdAt', 'ASC']]
+    }, User],
   })
   return {
     success: true,

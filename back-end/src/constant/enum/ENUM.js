@@ -23,6 +23,8 @@ const USER_ACTION = {
 const USER_ACTION_POINT = {
     WATCH: 1,
     LIKE: 3,
+    UNDO_LIKE: -3,
+    UNDO_DISLIKE: 3,
     DISLIKE: -3,
     COMMENT: 5
 }
