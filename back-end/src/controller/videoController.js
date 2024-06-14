@@ -416,6 +416,25 @@ const addWatchVideoEvent = async (req, res, next) => {
     })
 
 }
+
+const getTrendingVideos = async function (req, res, next) {
+  try {
+    const videos = await videoService.getTrendingVideos(req?.query?.page, req?.query?.pageSize);
+    console.log(videos)
+    return res.status(200).json({
+      success: true,
+      data: videos.data || [],
+      message: 'Get trending videos successful'
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({
+      success: false,
+      message: 'Get trending videos failed'
+    })
+  }
+
+}
 module.exports = {
 	createVideo,
 	updateVideo,
@@ -431,5 +450,6 @@ module.exports = {
 	getWatchedVideoByUserId,
   deleteWatchedVideoByUserId,
   streamMultipleResolutionsVideo,
-  addWatchVideoEvent
+  addWatchVideoEvent,
+  getTrendingVideos
 };

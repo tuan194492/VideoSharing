@@ -12,11 +12,12 @@ const { getVideoDurationInSeconds } = require('get-video-duration')
 const fs = require("fs");
 
 const transcodeFile = async (filePath, parentPath) => {
-  const t = new Transcoder(`${filePath}`, `${parentPath}`, {showLogs: false});
+  const t = new Transcoder(`${filePath}`, `${parentPath}`, {showLogs: true});
   try {
     const hlsPath = await t.transcode();
     console.log('Successfully Transcoded Video');
   } catch(e){
+    console.log(e)
     console.log('Something went wrong');
   }
 }
@@ -43,7 +44,7 @@ const createVideo = async (meta, file, user) => {
       if (!fs.existsSync(storePath)){    //check if folder already exists
         fs.mkdirSync(storePath);    //creating folder
       }
-      transcodeFile(url, storePath);
+      await transcodeFile(url, storePath);
       return {
 				success: true,
 				message: "Upload File successful",
@@ -465,6 +466,66 @@ const deleteWatchedHistory = async (userId) => {
   }
 }
 
+const getTrendingVideos = async (page, pageSize) => {
+  try {
+    page = parseInt(page, 10)
+    pageSize = parseInt(pageSize, 10)
+    // Calculate skip value based on page and pageSize
+    const skip = (page - 1) * pageSize;
+
+    // Get the start date of last week
+    const lastWeekStart = new Date();
+    lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+    // Aggregate logs by videoId and count occurrences of USER_ACTION.WATCH
+    const aggregationPipeline = [
+      {
+        $match: {
+          action: USER_ACTION.WATCH,
+          createdAt: { $gte: lastWeekStart } // Filter logs from last week
+        }
+      },
+      {
+        $group: {
+          _id: "$videoId",
+          totalWatchCount: { $sum: 1 } // Count occurrences of USER_ACTION.WATCH for each video
+        }
+      },
+      {
+        $sort: { totalWatchCount: -1 } // Sort by total watch count in descending order
+      },
+      {
+        $skip: skip // Skip documents based on skip value
+      },
+      {
+        $limit: pageSize // Limit the number of documents returned
+      }
+    ];
+
+    // Execute aggregation pipeline
+    const trendingVideos = await Log.aggregate(aggregationPipeline);
+    const result = [];
+    for (let video of trendingVideos) {
+      const videoData = await Video.findByPk(video._id, {
+        include: User
+      });
+      result.push({
+       ...videoData.dataValues,
+        watchCount: video.totalWatchCount
+      });
+    }
+    return {
+      success: true,
+      data: result
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err
+    };
+  }
+};
+
 module.exports = {
 	createVideo,
 	findVideoById,
@@ -477,5 +538,6 @@ module.exports = {
 	getMostWatchedVideos,
   	getLikedVideoByUser,
 	getWatchedVideoList,
-  deleteWatchedHistory
+  deleteWatchedHistory,
+  getTrendingVideos
 };
