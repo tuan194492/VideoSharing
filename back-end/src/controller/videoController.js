@@ -24,7 +24,7 @@ const createVideo = async (req, res, next) => {
 		thumbnail,
 	};
 	console.log(req.user);
-	const result = await videoService.createVideo(meta, file, req.user);
+	const result = await videoService.createVideoS3(meta, file, req.user);
 	if (result.success) {
 		const params = {
 			actorId: req.user.userId,

@@ -10,6 +10,8 @@ const {Log} = require("../model/Log");
 const {Transcoder} = require("simple-hls")
 const { getVideoDurationInSeconds } = require('get-video-duration')
 const fs = require("fs");
+const s3Serivce = require("./s3Service")
+const { PassThrough } = require('stream');
 
 const transcodeFile = async (filePath, parentPath) => {
   const t = new Transcoder(`${filePath}`, `${parentPath}`, {showLogs: true});
@@ -62,6 +64,45 @@ const createVideo = async (meta, file, user) => {
 			message: storeResult.message,
 		};
 	}
+};
+
+const createVideoS3 = async (meta, file, user) => {
+  const url = fileUtils.createUrlForVideo(file, user);
+  const bufferStream = new PassThrough();
+  bufferStream.end(file.data);
+  const videoLength = await getVideoDurationInSeconds(bufferStream);
+  console.log('Video length: ', videoLength)
+  meta = {
+    ...meta,
+    duration: videoLength
+  }
+  const createVideoResult = await createVideoMetaData(meta, '', user);
+  if (createVideoResult.success) {
+    const videoId = createVideoResult.data;
+    const baseVideoUrl = `${user.userId}/${videoId}/${file.name}`;
+    const storeResult = await s3Serivce.uploadVideo(file, baseVideoUrl);
+    const video = await Video.findByPk(videoId);
+    if (storeResult.success) {
+      video.url = baseVideoUrl;
+      await video.save();
+      return {
+        success: true,
+        message: "Upload File successful",
+        videoId: videoId,
+      };
+    } else {
+      await video.destroy();
+      return {
+        success: false,
+        message: createVideoResult.message,
+      };
+    }
+  } else {
+    return {
+      success: false,
+      message: createVideoResult.message,
+    };
+  }
 };
 
 const getViewerVideoList = async (data) => {
@@ -539,5 +580,6 @@ module.exports = {
   	getLikedVideoByUser,
 	getWatchedVideoList,
   deleteWatchedHistory,
-  getTrendingVideos
+  getTrendingVideos,
+  createVideoS3
 };

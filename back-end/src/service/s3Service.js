@@ -12,8 +12,8 @@ const s3 = new AWS.S3();
 
 const uploadVideo = async (file, folderPath = '') => {
     try {
-        const fileContent = fs.readFileSync(file.path);
-        const fileName = file.originalname;
+        const fileContent = file.data;
+        const fileName = file.name;
         const filePath = folderPath ? `${folderPath}/${fileName}` : fileName;
         const contentType = file.mimetype;
 
@@ -26,8 +26,6 @@ const uploadVideo = async (file, folderPath = '') => {
 
         const data = await s3.upload(params).promise();
 
-        // Clean up the uploaded file
-        fs.unlinkSync(file.path);
 
         return {
             success: true,
