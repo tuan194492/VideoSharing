@@ -13,6 +13,9 @@ const Video = require("../model/Video") ;
 const VIEW_COUNT_PERCENT = 1;
 const viewLogs = new Map();
 const recommenderServiceV2 = require("../service/biGraphRecommenderService");
+const dotenv = require("dotenv");
+dotenv.config();
+const BASE_CDN_SERVER = process.env.CDN_LINK;
 
 const getVideoDataById = async (req, res, next) => {};
 
@@ -375,7 +378,7 @@ const streamMultipleResolutionsVideo = async (req, res, next) => {
       })
     }
     const video = findVideo.data;
-    const videoPath = `/${video.publisher_id}/${video.id}/index.m3u8`;
+    const videoPath = `${BASE_CDN_SERVER}/${video.url}`;
     return res.status(200).json({
       success: true,
       data: videoPath

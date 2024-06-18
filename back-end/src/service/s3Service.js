@@ -14,7 +14,7 @@ const uploadVideo = async (file, folderPath = '') => {
     try {
         const fileContent = file.data;
         const fileName = file.name;
-        const filePath = folderPath ? `${folderPath}/${fileName}` : fileName;
+        const filePath = folderPath ? `${folderPath}` : fileName;
         const contentType = file.mimetype;
 
         const params = {
