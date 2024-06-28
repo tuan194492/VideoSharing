@@ -8,6 +8,7 @@ const reactionRoute = require("./reactionRoute");
 const channelRoute = require("./channelRoute");
 const playlistRoute = require("./playlistRoute");
 const reportRoute = require("./reportRoute");
+const settingRoute = require("./settingRoute");
 
 const route = (app) => {
     app.use("/api/auth", authRoute);
@@ -19,6 +20,7 @@ const route = (app) => {
     app.use("/api/channel", channelRoute);
     app.use("/api/playlist", playlistRoute);
     app.use("/api/report", reportRoute);
+    app.use("/api/setting", settingRoute);
 
 };
 

@@ -8,6 +8,7 @@ const Notification = require("../../model/Notification");
 const Playlist = require("../../model/Playlist");
 const PlaylistVideo = require("../../model/PlaylistVideo");
 const Report = require("../../model/Report");
+const Setting = require("../../model/Setting");
 
 const initRelation = () => {
     Video.belongsTo(User, { foreignKey: 'publisher_id' });
