@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
+require('dotenv').config();
 
 const connectMongoDB = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/VideoSharing");
-    console.log("Connect to mongo DB successful");
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connect to MongoDB successful");
   } catch (error) {
-    console.log("Connect to mongo DB fail");
+    console.log("Connect to MongoDB failed");
     console.error(error);
     process.exit(1);
   }

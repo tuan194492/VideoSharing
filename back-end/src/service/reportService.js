@@ -27,7 +27,8 @@ const createReport = async (type, videoId, commentId, channelId, reporterId, des
         video_id: videoId,
         comment_id: commentId,
         channel_id: channelId,
-        reporter_id: reporterId
+        reporter_id: reporterId,
+        status: REPORT_STATUS.PENDING // Only count pending report
       }
     })
     if (report) {

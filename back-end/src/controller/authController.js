@@ -115,6 +115,27 @@ const suspendUser = async (req, res) => {
   return res.status(500).json({ message: result.message });
 };
 
+const changePassword = async (req, res) => {
+  const userId = req.user.userId;
+  const { oldPassword, newPassword } = req.body;
+  console.log(req.body)
+  const user = await userService.getUserById(userId);
+  console.log(user.user.dataValues.password)
+  if (!(await bcrypt.compare(oldPassword, user.user.dataValues.password))) {
+    return res.status(400).json({ message: "Old password is not correct." });
+  }
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+  const updateResult = await userService.updateUser({
+    id: userId,
+    password: hashedPassword,
+  })
+  if (updateResult.success) {
+    return res.status(200).json({ message: "Update password successful!" });
+  }
+  return res.status(400).json({ message: updateResult.message });
+}
+
 module.exports = {
     login,
     register,
@@ -122,4 +143,5 @@ module.exports = {
     getAllUsers,
     activateUser,
     suspendUser,
+    changePassword
 }
