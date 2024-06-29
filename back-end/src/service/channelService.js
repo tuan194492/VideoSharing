@@ -274,11 +274,57 @@ const deleteWatchedVideo = async (logId) => {
   }
 }
 
+const searchChannel = async (keyword, page, pageSize) => {
+  try {
+    console.log(pageSize, keyword)
+    const channels = await User.findAll({
+      where: {
+        [Sequelize.Op.or]: [
+          Sequelize.where(
+            Sequelize.fn('LOWER', Sequelize.col('name')),
+            {
+              [Sequelize.Op.like]: `%${keyword.toLowerCase()}%`
+            }
+          ),
+          Sequelize.where(
+            Sequelize.fn('LOWER', Sequelize.col('shortname')),
+            {
+              [Sequelize.Op.like]: `%${keyword.toLowerCase()}%`
+            }
+          ),
+          Sequelize.where(
+            Sequelize.fn('LOWER', Sequelize.col('email')),
+            {
+              [Sequelize.Op.like]: `%${keyword.toLowerCase()}%`
+            }
+          ),
+        ]
+      },
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
+      order: [['createdAt', 'DESC']]
+    });
+    return {
+      success: true,
+      data: channels
+    }
+  } catch (err) {
+    console.log(err)
+    return {
+      success: false,
+      message: "Search channel failed",
+      data: []
+    }
+  }
+
+}
+
 
 module.exports  = {
   getViewCountByChannel,
   getSubscriberCountByChannel,
   mostWatchedVideoByDate,
   getChannelAnalyticsData,
-  deleteWatchedVideo
+  deleteWatchedVideo,
+  searchChannel
 }

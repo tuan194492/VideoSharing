@@ -98,7 +98,28 @@ const deleteWatchedVideo = async (req, res, next) => {
   }
 }
 
-
+const searchChannel = async (req, res, next) => {
+  let { keywords, page, pageSize } = req.query;
+  console.log("��������� ~ file: channelController.js:133 ~ searchChannel ~ req.query:", req.query)
+  const result = await channelService.searchChannel(
+    keywords,
+    page || 1,
+    pageSize || 10
+  );
+  if (result.success) {
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
+    } else {
+    return res.status(400).json({
+      success: false,
+      message: result.message,
+      data: []
+    });
+  }
+}
 
 
 module.exports = {
@@ -108,4 +129,5 @@ module.exports = {
   getMostWatchedVideos,
   getChannelAnalytics,
   deleteWatchedVideo,
+  searchChannel
 }
