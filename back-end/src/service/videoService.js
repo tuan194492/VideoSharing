@@ -10,8 +10,13 @@ const {Log} = require("../model/Log");
 const {Transcoder} = require("simple-hls")
 const { getVideoDurationInSeconds } = require('get-video-duration')
 const fs = require("fs");
+const path = require('path');
 const s3Serivce = require("./s3Service")
 const { PassThrough } = require('stream');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+require('dotenv').config();
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 const transcodeFile = async (filePath, parentPath) => {
   const t = new Transcoder(`${filePath}`, `${parentPath}`, {showLogs: true});
@@ -66,10 +71,42 @@ const createVideo = async (meta, file, user) => {
 	}
 };
 
+const createMasterPlaylist = async (baseFolder, videoId, resolutions) => {
+  try {
+    // Create master playlist content
+    let masterPlaylistContent = '#EXTM3U\n#EXT-X-VERSION:3\n';
+
+    resolutions.forEach((resolution, index) => {
+      const { bandwidth, resolution: res } = resolution;
+      const variantFileName = `${resolution.label}.m3u8`;
+      masterPlaylistContent += `#EXT-X-STREAM-INF:BANDWIDTH=${bandwidth},RESOLUTION=${res}\n${variantFileName}\n`;
+
+      // Create variant playlist file
+      const variantFilePath = path.join(baseFolder, variantFileName);
+      const variantPlaylistContent = `#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:10\n#EXT-X-MEDIA-SEQUENCE:0\n#EXTINF:10.000,\nsegment-0.ts\n#EXTINF:10.000,\nsegment-1.ts\n#EXT-X-ENDLIST\n`;
+      fs.writeFileSync(variantFilePath, variantPlaylistContent);
+
+      console.log(`Created variant playlist: ${variantFilePath}`); // Log success
+    });
+
+    // Create master playlist file
+    const masterPlaylistFilePath = path.join(baseFolder, 'master.m3u8');
+    fs.writeFileSync(masterPlaylistFilePath, masterPlaylistContent);
+
+    console.log(`Created master playlist: ${masterPlaylistFilePath}`); // Log success
+
+    return masterPlaylistFilePath;
+  } catch (error) {
+    console.error('Error creating HLS playlists:', error);
+    throw error;
+  }
+};
+
 const createVideoS3 = async (meta, file, user) => {
   const url = fileUtils.createUrlForVideo(file, user);
   const bufferStream = new PassThrough();
   bufferStream.end(file.data);
+  const cdnLink = process.env.CDN_LINK;
   const videoLength = await getVideoDurationInSeconds(bufferStream);
   console.log('Video length: ', videoLength)
   meta = {
@@ -80,9 +117,86 @@ const createVideoS3 = async (meta, file, user) => {
   if (createVideoResult.success) {
     const videoId = createVideoResult.data;
     const baseVideoUrl = `${user.userId}/${videoId}/${file.name}`;
+    const baseVideoHlsUrl = `${user.userId}/${videoId}/hls`;
     const storeResult = await s3Serivce.uploadVideo(file, baseVideoUrl);
+
+    // Write the input buffer to a temporary file
+    const tempInputFilePath = path.join('/tmp', `${file.name}`);
+    fs.writeFileSync(tempInputFilePath, file.data);
+
+    const hlsFolderPath = `/tmp/${videoId}`; // Temporary folder for HLS files
+    fs.mkdirSync(hlsFolderPath, { recursive: true });
+    const inputBufferStream = new PassThrough();
+    inputBufferStream.end(file.data);
+
+    // Video resolutions to encode
+    const videoResolutions = [
+      { resolution: '640x360', bitrate: '800k', bandwidth: 800000, label: 360 },
+      { resolution: '1280x720', bitrate: '2800k', bandwidth: 2800000, label: 720 },
+      { resolution: '1920x1080', bitrate: '5000k', bandwidth: 5000000, label: 1080 }
+    ];
+
+    const transcodePromises = videoResolutions.map(async (resolution) => {
+      const { resolution: res, bitrate } = resolution;
+      const outputFolder = `${hlsFolderPath}/${res}`;
+      fs.mkdirSync(outputFolder, { recursive: true });
+
+      return new Promise((resolve, reject) => {
+        ffmpeg(tempInputFilePath)
+          .outputOptions([
+            '-vf', `scale=${res}`,
+            '-b:v', bitrate,
+            '-c:a', 'aac',
+            '-profile:v', 'main',
+            '-crf', '20',
+            '-hls_time', '10', // Segment duration (e.g., 10 seconds)
+            '-hls_list_size', '0', // Number of playlist entries (0 means keep all)
+            '-hls_segment_filename', `${outputFolder}/${resolution.label}-%03d.ts`, // Segment filename pattern
+            '-f', 'hls',
+            '-hls_segment_type', 'mpegts',
+          ])
+          .output(`${outputFolder}/${resolution.label}.m3u8`) // Adjusted output path
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
+      });
+    });
+
+    await Promise.all(transcodePromises);
+
+    const masterPlaylistPath = await createMasterPlaylist(hlsFolderPath, videoId, videoResolutions);
+
+    const uploadPromises = [];
+    // Upload HLS files to S3
+    videoResolutions.forEach((resolution) => {
+      const { resolution: res } = resolution;
+      const resolutionFolder = `${hlsFolderPath}/${res}`;
+      const playlistPath = `${resolutionFolder}/index.m3u8`;
+
+      const files = fs.readdirSync(resolutionFolder);
+      files.forEach((file) => {
+        const filePath = path.join(resolutionFolder, file);
+        const fileData = fs.readFileSync(filePath);
+        const s3Path = path.join(`${baseVideoHlsUrl}`, file);
+        uploadPromises.push(s3Serivce.uploadVideo({ name: file, data: fileData }, s3Path));
+      });
+    });
+
+    const masterPlaylistData = fs.readFileSync(masterPlaylistPath);
+    const masterPlaylistS3Path = `${baseVideoHlsUrl}/index.m3u8`;
+    uploadPromises.push(s3Serivce.uploadVideo({ name: 'index.m3u8', data: masterPlaylistData }, masterPlaylistS3Path));
+
+    const storeResults = await Promise.all(uploadPromises);
+    const allSuccess = storeResults.every(result => result.success);
+
     const video = await Video.findByPk(videoId);
-    if (storeResult.success) {
+    // Delete temporary HLS files and input file
+
+    fs.rmdirSync(hlsFolderPath, { recursive: true });
+    fs.unlinkSync(tempInputFilePath);
+    console.log('Temporary files deleted:', hlsFolderPath, tempInputFilePath);
+
+    if (allSuccess && storeResult.success) {
       video.url = baseVideoUrl;
       await video.save();
       return {

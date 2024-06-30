@@ -12,6 +12,9 @@ const s3 = new AWS.S3();
 
 const uploadVideo = async (file, folderPath = '') => {
     try {
+        if (folderPath) {
+          folderPath = folderPath.replace(/\\/g, "/");
+        }
         const fileContent = file.data;
         const fileName = file.name;
         const filePath = folderPath ? `${folderPath}` : fileName;
