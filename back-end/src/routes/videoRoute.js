@@ -32,7 +32,7 @@ const videoMiddleware = require('../middlleware/videoMiddleware');
 router.get('/watch', videoController.getViewerVideoList);
 router.get('/watched-video', authMiddleware.getUserToken, videoController.getWatchedVideoByUserId);
 router.post('/watch-video/:id', authMiddleware.getUserToken, videoController.addWatchVideoEvent);
-router.get('/recommend-video', videoController.getRecommendVideo);
+router.get('/recommend-video', authMiddleware.getUserToken, videoController.getRecommendVideo);
 
 router.get('/trending-video', videoController.getTrendingVideos);
 router.delete('/watched-video', authMiddleware.authenticateToken, videoController.deleteWatchedVideoByUserId);

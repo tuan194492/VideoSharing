@@ -163,6 +163,9 @@ const getRecommendedVideosList = async (userId, page, pageSize) => {
         videoId: videos[index],
         point: value,
     })).sort((a, b) => b.point - a.point);
+
+    console.log(result);
+
     return collectionUtils.paginate(result, page, pageSize);
 }
 

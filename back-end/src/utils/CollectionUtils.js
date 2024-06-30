@@ -7,7 +7,7 @@ function paginate(array, page, pageSize) {
   if (page < 1 || pageSize < 1) {
     return array;
   }
-
+  console.log(page, pageSize)
   const startIndex = (page - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   return array.slice(startIndex, endIndex);

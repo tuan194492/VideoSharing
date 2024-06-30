@@ -442,10 +442,20 @@ const getTrendingVideos = async function (req, res, next) {
 }
 
 const getRecommendVideo = async (req, res, next) => {
-  const result = await recommenderServiceV2.getRecommendedVideosList(req.query?.userId);
+  let {page, pageSize} = req.query;
+  const recommendVideoIds = await recommenderServiceV2.getRecommendedVideosList(req?.user?.userId, page, pageSize);
+  console.log('recommendVideoIds', recommendVideoIds);
+  let result = [];
+  for (let videoId of recommendVideoIds) {
+    let video = await videoService.findVideoById(videoId.videoId, req?.user?.userId);
+    if (video && video.success) {
+      result.push(video.data);
+    }
+  }
   res.status(200).json({
     message: 'Recommend video',
-    data: result
+    data: result,
+    success: true
   });
 }
 module.exports = {
