@@ -103,7 +103,7 @@ const createMasterPlaylist = async (baseFolder, videoId, resolutions) => {
 };
 
 const createVideoS3 = async (meta, file, user) => {
-  const url = fileUtils.createUrlForVideo(file, user);
+  // const url = fileUtils.createUrlForVideo(file, user);
   const bufferStream = new PassThrough();
   bufferStream.end(file.data);
   const cdnLink = process.env.CDN_LINK;
