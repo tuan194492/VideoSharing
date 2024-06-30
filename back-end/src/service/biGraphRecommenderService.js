@@ -2,7 +2,9 @@ const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
 const videoService = require("./videoService");
+const Video = require("../model/Video");
 const collectionUtils = require("../utils/CollectionUtils");
+const {VIDEO_STATUS} = require("../constant/enum/ENUM");
 let suggestionPointsMatrix = [];
 let baseReactionPointsMatrix = [];
 let pathWithWeightBetweenUsersMatrix = [];
@@ -55,6 +57,9 @@ function normalizeMatrix(matrix) {
 }
 const buildBaseReactionPointsMatrix = async () => {
     // Tạo ma trận điểm tương tác người dùng với video
+
+
+
     if (!baseReactionPointsMatrix || baseReactionPointsMatrix.length === 0) {
         const recommendPoints = await RecommendPoints.find();
         recommendPoints.forEach((data) => {
@@ -163,6 +168,24 @@ const getRecommendedVideosList = async (userId, page, pageSize) => {
         videoId: videos[index],
         point: value,
     })).sort((a, b) => b.point - a.point);
+
+    const publicVideos = await Video.findAll({
+      where: {
+        status: VIDEO_STATUS.PUBLIC
+      },
+      order: [['views', 'DESC']],
+    })
+
+    // Push all videos Id to result array, if not in array create new {videoId, point: 0}
+    publicVideos.forEach(publicVideo => {
+    const foundIndex = result.findIndex(item => item.videoId === publicVideo.id);
+    if (foundIndex === -1) {
+      result.push({
+        videoId: publicVideo.id,
+        point: 0
+      });
+    }
+    });
 
     console.log(result);
 
