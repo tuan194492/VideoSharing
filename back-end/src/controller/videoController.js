@@ -10,7 +10,7 @@ const loggingService = require("../service/loggingService");
 const recommenderService = require("../service/recommenderService");
 const { NOTIFY_ACTION, USER_ACTION, VIDEO_STATUS } = require("../constant/enum/ENUM");
 const Video = require("../model/Video") ;
-const VIEW_COUNT_PERCENT = 1;
+const Setting = require("../model/Setting")
 const viewLogs = new Map();
 const recommenderServiceV2 = require("../service/biGraphRecommenderService");
 const dotenv = require("dotenv");
@@ -396,16 +396,21 @@ const addWatchVideoEvent = async (req, res, next) => {
     const videoId = req.params.id;
     const userId = req?.user?.userId;
     const watchTime = req.body?.watchTime || 0;
-    const MIN_WATCH_TIME = 5;
-    if (watchTime < MIN_WATCH_TIME) {
-      return res.status(200).json({
-        success: true,
-        message: `Watch time must be greater than ${MIN_WATCH_TIME} seconds`
-      })
+    const setting = await Setting.findOne();
+    let MIN_WATCH_TIME = 5;
+    let VIEW_COUNT_PERCENT = 1;
+    if (setting) {
+      VIEW_COUNT_PERCENT = setting.view_count_percent;
     }
+    if (watchTime < MIN_WATCH_TIME) {
+        return res.status(200).json({
+          success: true,
+          message: `Watch time must be greater than ${MIN_WATCH_TIME} seconds`
+        })
+      }
     const video = await Video.findByPk(videoId);
     if (video) {
-      if (watchTime >= VIEW_COUNT_PERCENT) {
+      if (watchTime >= VIEW_COUNT_PERCENT / 100 * video.video_length_in_seconds) {
         videoService.addViewForVideo(videoId);
       }
       loggingService.createLog({

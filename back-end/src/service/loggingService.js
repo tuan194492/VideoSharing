@@ -2,6 +2,7 @@ const express = require("express");
 const { Log } = require("../model/Log");
 const { RecommendPoints } = require("../model/RecommendPoints");
 const { WatchedVideo } = require("../model/WatchedVideo");
+const Setting = require("../model/Setting");
 const { USER_ACTION_POINT, USER_ACTION } = require("../constant/enum/ENUM");
 const Video = require("../model/Video");
 /*
@@ -72,15 +73,17 @@ const createLog = async (params) => {
 };
 
 const getUserActionPoint = (action) => {
+  const setting = Setting.findOne();
+
 	switch (action) {
 		case USER_ACTION.LIKE:
-			return USER_ACTION_POINT.LIKE;
+			return setting ? setting.point_for_like : USER_ACTION_POINT.LIKE;
 		case USER_ACTION.DISLIKE:
-			return USER_ACTION_POINT.DISLIKE;
+			return setting ? setting.point_for_dislike : USER_ACTION_POINT.DISLIKE;
 		case USER_ACTION.WATCH:
-			return USER_ACTION_POINT.WATCH;
+			return setting ? setting.point_for_watch : USER_ACTION_POINT.WATCH;
 		case USER_ACTION.COMMENT:
-			return USER_ACTION_POINT.COMMENT;
+			return setting ? setting.point_for_comment : USER_ACTION_POINT.COMMENT;
 		default:
 			return 0;
 	}
