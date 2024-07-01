@@ -15,7 +15,6 @@ let videos = [];
 let points = [];
 
 function transposeMatrix(matrix) {
-    if (matrix.length < 1) return;
     return matrix[0].map((col, i) => matrix.map(row => row[i]));
 }
 
@@ -57,6 +56,10 @@ function normalizeMatrix(matrix) {
   return matrix.map(row => row.map(value => value / max));
 }
 const buildBaseReactionPointsMatrix = async () => {
+    // Tạo ma trận điểm tương tác người dùng với video
+
+
+
     if (!baseReactionPointsMatrix || baseReactionPointsMatrix.length === 0) {
         const recommendPoints = await RecommendPoints.find();
         recommendPoints.forEach((data) => {
@@ -202,9 +205,6 @@ const resetMatrix = () => {
 
 const initMatrix = async () => {
     await buildBaseReactionPointsMatrix();
-    if (videos.length === 0) {
-      return [];
-    }
     const numberOfUser= baseReactionPointsMatrix.length;
     buildSimilarityMatrix(baseReactionPointsMatrix);
     buildPathMatrix();
