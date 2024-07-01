@@ -56,12 +56,11 @@ function normalizeMatrix(matrix) {
   return matrix.map(row => row.map(value => value / max));
 }
 const buildBaseReactionPointsMatrix = async () => {
-    // Tạo ma trận điểm tương tác người dùng với video
-
-
+    console.log(baseReactionPointsMatrix);
 
     if (!baseReactionPointsMatrix || baseReactionPointsMatrix.length === 0) {
         const recommendPoints = await RecommendPoints.find();
+        console.log(recommendPoints)
         recommendPoints.forEach((data) => {
             const user = data.userId;
             const video = data.videoId;

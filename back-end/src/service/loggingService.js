@@ -49,7 +49,8 @@ const createLog = async (params) => {
       });
       data.save();
     } else {
-      recommendPoint.point = recommendPoint.point + getUserActionPoint(params.action);
+      const newPoint = await getUserActionPoint(params.action);
+      recommendPoint.point = recommendPoint.point + newPoint;
       recommendPoint.save();
     }
     const watchedVideo = await WatchedVideo.findOne({
@@ -72,18 +73,18 @@ const createLog = async (params) => {
 
 };
 
-const getUserActionPoint = (action) => {
-  const setting = Setting.findOne();
-
+const getUserActionPoint = async (action) => {
+  const setting = await Setting.findOne();
+  console.log('Setting', JSON.stringify(setting))
 	switch (action) {
 		case USER_ACTION.LIKE:
-			return setting ? setting.point_for_like : USER_ACTION_POINT.LIKE;
+			return setting ? parseInt(setting.point_for_like) : USER_ACTION_POINT.LIKE;
 		case USER_ACTION.DISLIKE:
-			return setting ? setting.point_for_dislike : USER_ACTION_POINT.DISLIKE;
+			return setting ? parseInt(setting.point_for_dislike) : USER_ACTION_POINT.DISLIKE;
 		case USER_ACTION.WATCH:
-			return setting ? setting.point_for_watch : USER_ACTION_POINT.WATCH;
+			return setting ? parseInt(setting.point_for_watch) : USER_ACTION_POINT.WATCH;
 		case USER_ACTION.COMMENT:
-			return setting ? setting.point_for_comment : USER_ACTION_POINT.COMMENT;
+			return setting ? parseInt(setting.point_for_comment) : USER_ACTION_POINT.COMMENT;
 		default:
 			return 0;
 	}

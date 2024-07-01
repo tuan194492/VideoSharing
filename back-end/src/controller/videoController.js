@@ -400,7 +400,7 @@ const addWatchVideoEvent = async (req, res, next) => {
     let MIN_WATCH_TIME = 5;
     let VIEW_COUNT_PERCENT = 1;
     if (setting) {
-      VIEW_COUNT_PERCENT = setting.view_count_percent;
+      VIEW_COUNT_PERCENT = parseInt(setting.view_count_percent);
     }
     if (watchTime < MIN_WATCH_TIME) {
         return res.status(200).json({
