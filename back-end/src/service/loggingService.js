@@ -44,7 +44,7 @@ const createLog = async (params) => {
     if (!recommendPoint) {
       const data = new RecommendPoints({
         userId: params.userId,
-        point: getUserActionPoint(params.action),
+        point: await getUserActionPoint(params.action),
         videoId: params.videoId,
       });
       data.save();
