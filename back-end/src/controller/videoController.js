@@ -410,6 +410,9 @@ const addWatchVideoEvent = async (req, res, next) => {
       }
     const video = await Video.findByPk(videoId);
     if (video) {
+		console.log('Watch time', watchTime);
+		console.log('View count percent', VIEW_COUNT_PERCENT);
+		console.log('Video length', video.video_length_in_seconds);
       if (watchTime >= VIEW_COUNT_PERCENT / 100 * video.video_length_in_seconds) {
         videoService.addViewForVideo(videoId);
       }
