@@ -396,11 +396,16 @@ const storeVideo = (file, url) => {
 const findVideoById = async (id, guestId) => {
 	try {
 		console.log(guestId);
-		const video = await Video.findByPk(id, {
+		let video = await Video.findByPk(id, {
 			include: [User]
 		});
 
 		if (video) {
+			video = {
+				...video,
+				user_name: video.User?.name
+			}
+
 			if (video.status == VIDEO_STATUS.PRIVATE && guestId != video.publisher_id) {
 				return {
 					success: false,
@@ -695,7 +700,7 @@ module.exports = {
 	getMostWatchedVideos,
   	getLikedVideoByUser,
 	getWatchedVideoList,
-  deleteWatchedHistory,
-  getTrendingVideos,
-  createVideoS3
+    deleteWatchedHistory,
+    getTrendingVideos,
+    createVideoS3
 };

@@ -433,10 +433,28 @@ const addWatchVideoEvent = async (req, res, next) => {
 const getTrendingVideos = async function (req, res, next) {
   try {
     const videos = await videoService.getTrendingVideos(req?.query?.page, req?.query?.pageSize);
-    console.log(videos)
+	  let videosWithUser = [];
+	  console.log(videos)
+	  if (videos.success) {
+		  for (let video of videos.data) {
+			  const data = await userService.getUserById(
+				  video.publisher_id
+			  );
+			  const user = data.success ? data.user : null;
+			  if (video.publisher_id != userId && video.status != VIDEO_STATUS.PUBLIC) {
+				  continue;
+			  } else {
+				  videosWithUser.push({
+					  ...video,
+					  user_name: user?.name || "No name",
+				  });
+			  }
+
+		  }
+	  }
     return res.status(200).json({
       success: true,
-      data: videos.data || [],
+      data: videosWithUser || [],
       message: 'Get trending videos successful'
     })
   } catch (error) {
