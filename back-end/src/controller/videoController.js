@@ -433,6 +433,8 @@ const addWatchVideoEvent = async (req, res, next) => {
 const getTrendingVideos = async function (req, res, next) {
   try {
     const videos = await videoService.getTrendingVideos(req?.query?.page, req?.query?.pageSize);
+    const userId = req?.user?.userId;
+
 	  let videosWithUser = [];
 	  console.log(videos)
 	  if (videos.success) {
