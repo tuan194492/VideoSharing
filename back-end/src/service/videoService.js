@@ -396,7 +396,9 @@ const storeVideo = (file, url) => {
 const findVideoById = async (id, guestId) => {
 	try {
 		console.log(guestId);
-		const video = await Video.findByPk(id);
+		const video = await Video.findByPk(id, {
+			include: [User]
+		});
 
 		if (video) {
 			if (video.status == VIDEO_STATUS.PRIVATE && guestId != video.publisher_id) {

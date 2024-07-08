@@ -161,7 +161,24 @@ const getRecommendedVideosList = async (userId, page, pageSize) => {
     }
     let userIndex = users.indexOf(parseInt(userId));
     if (userIndex < 0) {
-      return [];
+        const publicVideos = await Video.findAll({
+            where: {
+                status: VIDEO_STATUS.PUBLIC
+            },
+            order: [['views', 'DESC']],
+        })
+
+        // Push all videos Id to result array, if not in array create new {videoId, point: 0}
+        publicVideos.forEach(publicVideo => {
+            const foundIndex = result.findIndex(item => item.videoId === publicVideo.id);
+            if (foundIndex === -1) {
+                result.push({
+                    videoId: publicVideo.id,
+                    point: 0
+                });
+            }
+        });
+        return collectionUtils.paginate(result, page, pageSize);
     }
     const result = suggestionPointsMatrix[userIndex].map((value, index) => ({
         videoId: videos[index],
