@@ -133,7 +133,7 @@ const createVideoS3 = async (meta, file, user) => {
     const videoResolutions = [
       { resolution: '640x360', bitrate: '800k', bandwidth: 800000, label: 360 },
       { resolution: '1280x720', bitrate: '2800k', bandwidth: 2800000, label: 720 },
-      { resolution: '1920x1080', bitrate: '5000k', bandwidth: 5000000, label: 1080 }
+      // { resolution: '1920x1080', bitrate: '5000k', bandwidth: 5000000, label: 1080 }
     ];
 
     const transcodePromises = videoResolutions.map(async (resolution) => {
