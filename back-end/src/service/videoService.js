@@ -156,6 +156,15 @@ const createVideoS3 = async (meta, file, user) => {
             '-hls_segment_type', 'mpegts',
           ])
           .output(`${outputFolder}/${resolution.label}.m3u8`) // Adjusted output path
+          .on('start', commandLine => {
+            console.log('Spawned FFmpeg with command: ' + commandLine);
+          })
+          .on('progress', progress => {
+            console.log(`Processing: ${progress.percent}% done`);
+          })
+          .on('stderr', stderrLine => {
+            console.log('Stderr output: ' + stderrLine);
+          })
           .on('end', resolve)
           .on('error', reject)
           .run();
