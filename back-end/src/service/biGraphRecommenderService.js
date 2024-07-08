@@ -159,6 +159,7 @@ const getRecommendedVideosList = async (userId, page, pageSize) => {
     if (!suggestionPointsMatrix || suggestionPointsMatrix.length === 0) {
       await initMatrix();
     }
+    let result = []
     let userIndex = users.indexOf(parseInt(userId));
     if (userIndex < 0) {
         const publicVideos = await Video.findAll({
@@ -180,7 +181,7 @@ const getRecommendedVideosList = async (userId, page, pageSize) => {
         });
         return collectionUtils.paginate(result, page, pageSize);
     }
-    const result = suggestionPointsMatrix[userIndex].map((value, index) => ({
+    result = suggestionPointsMatrix[userIndex].map((value, index) => ({
         videoId: videos[index],
         point: value,
     })).sort((a, b) => b.point - a.point);
