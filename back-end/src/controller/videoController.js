@@ -476,7 +476,7 @@ const getRecommendVideo = async (req, res, next) => {
   let result = [];
   for (let videoId of recommendVideoIds) {
     let video = await videoService.findVideoById(videoId.videoId, req?.user?.userId);
-    if (video && video.success) {
+    if (video && video.success && video.data.status === VIDEO_STATUS.PUBLIC) {
       result.push(video.data);
     }
   }
