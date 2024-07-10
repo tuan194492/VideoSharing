@@ -79,8 +79,7 @@ const buildBaseReactionPointsMatrix = async () => {
         recommendPoints.forEach((data) => {
             const user = data.userId;
             const video = data.videoId;
-            const point = data.point;
-            points[users.indexOf(user)][videos.indexOf(video)] = point;
+            points[users.indexOf(user)][videos.indexOf(video)] = data.point;
         });
         baseReactionPointsMatrix = points;
 
@@ -97,9 +96,13 @@ const buildBaseReactionPointsMatrix = async () => {
 const similarityPoint = (user1Index, user2Index, videoIndex, pointMatrix, maxNumber) => {
     if (user1Index === user2Index) {
         return 0;
-    } else {
-        return ((maxNumber - Math.abs(pointMatrix[user1Index][videoIndex] - pointMatrix[user2Index][videoIndex])) / maxNumber).toFixed(2);
     }
+    if (pointMatrix[user1Index][videoIndex] === 0 || pointMatrix[user2Index][videoIndex] === 0) {
+      return 0;
+    }
+
+    return ((maxNumber - Math.abs(pointMatrix[user1Index][videoIndex] - pointMatrix[user2Index][videoIndex])) / maxNumber).toFixed(2);
+
 }
 
 const buildSimilarityMatrix = (pointMatrix) => {
@@ -111,7 +114,12 @@ const buildSimilarityMatrix = (pointMatrix) => {
           if (i === j) {
             row.push(1);
           } else {
-            row.push(similarityPoint(i, j, 0, pointMatrix, maxPoint));
+            let sum = 0;
+            let videoLength = videos.length;
+            for (let k = 0; k < videoLength; k ++) {
+              sum += similarityPoint(i, j, k, pointMatrix, maxPoint);
+            }
+            row.push(sum / videoLength);
           }
         }
         similarityMatrix.push(row);
