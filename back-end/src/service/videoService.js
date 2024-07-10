@@ -305,9 +305,11 @@ const updateVideo = async (videoData, thumbnail, id) => {
 			const { title, description } = videoData;
 			video.title = title;
 			video.description = description;
-      if (thumbnail) {
-        video.thumbnail = thumbnail;
-      }
+			video.status = videoData.isPublic ? VIDEO_STATUS.PUBLIC : VIDEO_STATUS.PRIVATE;
+
+			if (thumbnail) {
+				video.thumbnail = thumbnail?.data;
+		    }
 			await video.save();
 			return {
 				success: true,
@@ -332,7 +334,7 @@ const deleteVideoById = async (id) => {
 		let video = await Video.findByPk(id);
 		console.log(video.dataValues.id);
 		if (video) {
-			console.log("ABC DEF");
+			console.log("Delete Video");
 			video.status = VIDEO_STATUS.DELETED;
 			await video.save(); // Soft delete
 			return {
@@ -500,8 +502,9 @@ const fullTextSearchVideo = async (keyword, page, pageSize) => {
 						`MATCH(Video.title, Video.description) AGAINST('+${searchQuery}*' IN BOOLEAN MODE)`
 					),
 				],
+				status: VIDEO_STATUS.PUBLIC
 			},
-      include: User,
+      		include: User,
 			page: page - 1,
 			limit: pageSize,
 			order: [['views', 'DESC']]
@@ -680,10 +683,13 @@ const getTrendingVideos = async (page, pageSize) => {
       const videoData = await Video.findByPk(video._id, {
         include: User
       });
-      result.push({
-       ...videoData.dataValues,
-        watchCount: video.totalWatchCount
-      });
+	  if (videoData.dataValues.status === VIDEO_STATUS.PUBLIC) {
+		  result.push({
+			  ...videoData.dataValues,
+			  watchCount: video.totalWatchCount
+		  });
+	  }
+
     }
     return {
       success: true,
