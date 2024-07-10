@@ -15,6 +15,7 @@ const s3Serivce = require("./s3Service")
 const { PassThrough } = require('stream');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+const { RecommendPoints } = require("../model/RecommendPoints");
 require('dotenv').config();
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
@@ -101,6 +102,25 @@ const createMasterPlaylist = async (baseFolder, videoId, resolutions) => {
     throw error;
   }
 };
+
+async function initPointWhenUploadVideo(videoId, userId) {
+  const INITIAL_POINT = 20;
+  const recommendPoint = await RecommendPoints.findOne({
+    userId: userId,
+    videoId: videoId,
+  }).exec();
+  if (!recommendPoint) {
+    const data = new RecommendPoints({
+      userId: userId,
+      point: INITIAL_POINT,
+      videoId: videoId,
+    });
+    data.save();
+  } else {
+    recommendPoint.point = recommendPoint.point + INITIAL_POINT;
+    recommendPoint.save();
+  }
+}
 
 const createVideoS3 = async (meta, file, user) => {
   // const url = fileUtils.createUrlForVideo(file, user);
@@ -208,6 +228,7 @@ const createVideoS3 = async (meta, file, user) => {
     if (allSuccess && storeResult.success) {
       video.url = baseVideoUrl;
       await video.save();
+      await initPointWhenUploadVideo(videoId, user.userId);
       return {
         success: true,
         message: "Upload File successful",
