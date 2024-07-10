@@ -306,7 +306,7 @@ const updateVideo = async (videoData, thumbnail, id) => {
 			console.log("Video update data ", JSON.stringify(videoData));
 			video.title = title;
 			video.description = description;
-			video.status = videoData.isPublic ? VIDEO_STATUS.PUBLIC : VIDEO_STATUS.PRIVATE;
+			video.status = videoData.status;
 
 			if (thumbnail) {
 				video.thumbnail = thumbnail?.data;
