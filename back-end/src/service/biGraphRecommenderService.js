@@ -101,7 +101,7 @@ const similarityPoint = (user1Index, user2Index, videoIndex, pointMatrix, maxNum
       return 0;
     }
 
-    return ((maxNumber - Math.abs(pointMatrix[user1Index][videoIndex] - pointMatrix[user2Index][videoIndex])) / maxNumber).toFixed(2);
+    return ((maxNumber - Math.abs(pointMatrix[user1Index][videoIndex] - pointMatrix[user2Index][videoIndex])) / maxNumber);
 
 }
 
